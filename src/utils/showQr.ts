@@ -1,28 +1,24 @@
-import { IncomingMessage, ServerResponse } from "http";
-import qrcode from "qrcode-terminal";
-import type { Client } from "whatsapp-web.js";
+import qrcode from "qrcode";
+import { Client } from "whatsapp-web.js";
 
-let latestQR: string | null = null;
+let qrSvg: string | null = null;
 
-function showQr(client: Client, attachHandler: (handler: (req: IncomingMessage, res: ServerResponse) => void) => void) {
-  client.on("qr", (qr) => {
-    latestQR = qr;
-    qrcode.generate(qr, { small: true });
+function showQr(client: Client, addHandler: (handler: (req: any, res: any) => void) => void) {
+  client.on("qr", async (qr) => {
+    qrSvg = await qrcode.toDataURL(qr);
+    console.log("📸 QR generado y accesible desde el navegador");
   });
 
-  // Agrega un handler a tu servidor HTTP
-  attachHandler((req, res) => {
-    if (req.url === "/qr") {
-      if (!latestQR) {
-        res.writeHead(404, { "Content-Type": "text/plain" });
-        res.end("QR code not generated yet");
-      } else {
-        qrcode.generate(latestQR, { small: true }, (asciiQR:any) => {
-          res.writeHead(200, { "Content-Type": "text/plain" });
-          res.end(asciiQR);
-        });
-      }
+  addHandler((req, res) => {
+    if (req.url === "/") {
+      res.writeHead(200, { "Content-Type": "text/html" });
+      res.end(
+        qrSvg
+          ? `<img src="${qrSvg}" />`
+          : "QR aún no disponible o ya fue escaneado."
+      );
     }
   });
 }
+
 export default showQr;
