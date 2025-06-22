@@ -5,6 +5,12 @@ import DatabaseManager from "./db/database";
 import { log } from "./utils/logger";
 import TopAntipala from "./classes/topAntipala";
 import { topDiarioCommand } from "./commands/topDiario";
+import http from 'http';
+
+http.createServer((_, res) => {
+  res.writeHead(200);
+  res.end('Bot is running');
+}).listen(process.env.PORT || 3000);
 
 
 
