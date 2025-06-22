@@ -11,7 +11,7 @@ class TopDiario {
     this.fecha = fecha;
     this.toperos = toperos;
   }
-private readonly MAX_RETRIES = 3;
+  private readonly MAX_RETRIES = 3;
   async save(): Promise<void> {
     const dbManager = await DatabaseManager.getInstance();
     const db = dbManager.getDB();

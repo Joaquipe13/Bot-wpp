@@ -5,6 +5,7 @@ import DatabaseManager from "./db/database";
 import TopAntipala from "./classes/topAntipala";
 import { topDiarioCommand } from "./commands/topDiario";
 import http from 'http';
+import parseTop from "./utils/parseTop";
 
 http.createServer((_, res) => {
   res.writeHead(200);
@@ -65,23 +66,7 @@ client.on("message", async (msg) => {
 
   if (body.startsWith("Top antipala del dia")) {
     try {
-      const lines = body.split("\n").map((line) => line.trim());
-      const fechaRegex = /Top antipala del dia (\d{2}\/\d{2}\/\d{4})/i;
-      const match = lines[0].match(fechaRegex);
-
-      if (!match) {
-        await msg.reply("❌ Formato de fecha inválido. Usá: dd/mm/aaaa");
-        return;
-      }
-
-      const [dia, mes, anio] = match[1].split("/");
-      const fecha = new Date(+anio, +mes - 1, +dia);
-
-      const nombres: string[] = lines
-        .slice(1)
-        .map((line) => line.replace(/^\d+\s+/, "").trim())
-        .filter((nombre) => nombre.length > 0);
-
+      const {nombres, fecha} = parseTop(body);
       const topAntipala = TopAntipala.getInstance();
 
       let toperos;
@@ -97,9 +82,22 @@ client.on("message", async (msg) => {
       const reply = await topAntipala.getTopAntipala()
       console.log(`📊 Top antipala del día ${fecha.toISOString()} enviado.`);
       await msg.reply(reply);
-    }catch (err:any) {
-      if (err.message) {
-        await msg.reply(err.message);
+    }catch (error:any) {
+      if (error.message) {
+        await msg.reply(error.message);
+      }else{
+        await msg.reply("❌ Error al procesar el top. Verificá el formato.");
+      }
+    }
+  }
+  if (body.startsWith("/top")) {
+    try {
+      const topAntipala = TopAntipala.getInstance();
+      const reply = await topAntipala.getTopAntipala();
+      await msg.reply(reply);
+    }catch (error: any) {
+      if (error.message) {
+        await msg.reply(error.message);
       }else{
         await msg.reply("❌ Error al procesar el top. Verificá el formato.");
       }
