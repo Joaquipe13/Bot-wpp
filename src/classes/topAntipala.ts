@@ -23,11 +23,21 @@ class TopAntipala {
   const db = await this.getDB();
 
   const [rows] = await db.query<RowDataPacket[]>(`
-    SELECT t.name, SUM(tdt.puntos) AS total_points
-    FROM top_diario_toperos tdt
-    JOIN toperos t ON tdt.topero_id = t.id
-    GROUP BY tdt.topero_id
-    ORDER BY total_points DESC;
+    SELECT 
+	t.name,
+	COALESCE(tops.total_top_points, 0) - COALESCE(finals.total_final_points, 0) AS total_points
+	FROM toperos t
+	LEFT JOIN (
+	SELECT topero_id, SUM(puntos) AS total_top_points
+	FROM top_diario_toperos
+	GROUP BY topero_id
+	) AS tops ON tops.topero_id = t.id
+	LEFT JOIN (
+	SELECT topero_id, SUM(puntos) AS total_final_points
+	FROM finales
+	GROUP BY topero_id
+	) AS finals ON finals.topero_id = t.id
+	ORDER BY total_points DESC;
   `);
   const results = rows as Array<{ name: string; total_points: number }>;
   if (results.length === 0) {
@@ -74,6 +84,24 @@ class TopAntipala {
     }
 	console.log(encontrados);
     return encontrados;
+  }
+  public async getTopsList(): Promise<string[]> {
+	const db = await this.getDB();
+	const [rows] = await db.query<RowDataPacket[]>(`
+		SELECT 
+		CONCAT(
+			'Top antipala del dia ', d.fecha, ':\n',
+			GROUP_CONCAT(CONCAT(dt.posicion, ' ', t.name) ORDER BY dt.posicion SEPARATOR '\n')
+		) AS top_texto
+		FROM top_diario_toperos dt
+		JOIN top_diarios d ON d.id = dt.top_diario_id
+		JOIN toperos t ON t.id = dt.topero_id
+		GROUP BY d.fecha
+		ORDER BY d.fecha DESC
+	`);
+
+  	return rows.map((row) => row.top_texto as string);
+
   }
 
 

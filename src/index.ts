@@ -7,6 +7,8 @@ import parseTop from "./utils/parseTop";
 import showQr from "./utils/showQr";
 import dotenv from "dotenv";
 import http from "http";
+import showAllTops from "./commands/showAllTops";
+import uploadFinal from "./commands/uploadFinal";
 
 dotenv.config();
 
@@ -24,6 +26,7 @@ const server = http.createServer(); // sin handler directo
     process.exit(1);
   }
 })();
+const topAntipala = TopAntipala.getInstance();
 
 const client = new Client({
   authStrategy: new LocalAuth(),
@@ -69,10 +72,10 @@ client.on("message", async (msg) => {
     return;
   }
 
-  if (body.startsWith("/Top antipala del dia")) {
+  if (body.startsWith("Top antipala del dia")) {
     try {
       const { nombres, fecha } = parseTop(body);
-      const topAntipala = TopAntipala.getInstance();
+      
       const toperos = await topAntipala.validarUsuariosExistentes(nombres);
 
       await topDiarioCommand(toperos, fecha);
@@ -87,11 +90,32 @@ client.on("message", async (msg) => {
 
   if (body.startsWith("/top")) {
     try {
-      const topAntipala = TopAntipala.getInstance();
+      
       const reply = await topAntipala.getTopAntipala();
       await msg.reply(reply);
     } catch (error: any) {
       await msg.reply(error.message || "❌ Error al obtener el top.");
     }
   }
+  if (body.startsWith("/topdiario")) {
+	try {
+	  	const tops = await showAllTops();
+	  await msg.reply(tops.join("\n\n"));
+	} catch (error: any) {
+	  await msg.reply(error.message || "❌ Error al obtener el top diario.");
+	}
+  }
+  if (body.startsWith("/final")) {
+	console.log("📥 Subiendo un final...");
+	try {
+	 const content = msg.body.trim();
+	 const reply = await uploadFinal(content)
+	 await msg.reply(reply)
+	 const top = await topAntipala.getTopAntipala();
+	 await msg.reply(top)
+	} catch (error: any) {
+	  await msg.reply(error.message || "❌ Error al cargar un final.");
+	}
+}
+
 });

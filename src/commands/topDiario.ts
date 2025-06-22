@@ -1,4 +1,3 @@
-import { Message } from "whatsapp-web.js";
 import  TopAntipala  from "../classes/topAntipala";
 import TopDiario from "../classes/topDiario";
 import Topero from "../classes/topero";

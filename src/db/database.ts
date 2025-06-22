@@ -80,6 +80,17 @@ class DatabaseManager {
           FOREIGN KEY (topero_id) REFERENCES toperos(id)
         );
       `);
+	  await this.connection.execute(`
+        CREATE TABLE IF NOT EXISTS finales (
+		  id INT AUTO_INCREMENT PRIMARY KEY,
+		  topero_id INT NOT NULL,
+		  fecha DATE NOT NULL,
+		  nota INT NOT NULL,
+		  materia VARCHAR(255) NOT NULL,
+		  puntos INT NOT NULL,
+		  FOREIGN KEY (topero_id) REFERENCES toperos(id)
+		);
+		`);
     }catch (error) {
   		console.error("❌ Error conectando a la base de datos:", error);
   		throw error; // o no lo tires, y dejá que se maneje más arriba
