@@ -28,14 +28,15 @@ class DatabaseManager {
   }
 
   private async init() {
-    try {
-		console.log("➡️ Intentando conectar con:", {
+    console.log("➡️ Intentando conectar con:", {
 			host: DB_HOST,
 			port: DB_PORT,
 			user: DB_USER,
 			database: DB_DATABASE,
 			password: DB_PASSWORD ? "********" : "no password provided",
 		});
+	try {
+		
       	this.connection = await mysql.createConnection({
 			host: DB_HOST,
 			port: parseInt(DB_PORT || "3306", 10),

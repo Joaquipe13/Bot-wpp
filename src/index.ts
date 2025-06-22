@@ -6,11 +6,14 @@ import TopAntipala from "./classes/topAntipala";
 import { topDiarioCommand } from "./commands/topDiario";
 import http from 'http';
 import parseTop from "./utils/parseTop";
-
+import showQr from "./utils/showQr";
+import dotenv from "dotenv";
+dotenv.config();
+const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 http.createServer((_, res) => {
   res.writeHead(200);
   res.end('Bot is running');
-}).listen(process.env.PORT || 3000);
+}).listen(port);
 
 
 
@@ -48,6 +51,8 @@ client.on("disconnected", (reason) => {
   console.warn("⚠️ Desconectado:", reason);
 });
 client.on("qr", (qr) => {
+	const lastedQR = qr;
+	showQr(client,port , qr);
   qrcode.generate(qr, { small: true });
 });
 
