@@ -34,3 +34,7 @@ tsc-watch.log
 
 .prettierignore
 .prettierrc
+
+# Web cache
+/.wwebjs_auth
+/.wwebjs_cache

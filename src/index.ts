@@ -4,17 +4,21 @@ import { pingCommand } from "./commands/ping";
 import DatabaseManager from "./db/database";
 import TopAntipala from "./classes/topAntipala";
 import { topDiarioCommand } from "./commands/topDiario";
+import log from "./utils/logger";
 import http from 'http';
 import parseTop from "./utils/parseTop";
 import showQr from "./utils/showQr";
 import dotenv from "dotenv";
 dotenv.config();
-const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
-http.createServer((_, res) => {
-  res.writeHead(200);
-  res.end('Bot is running');
-}).listen(port);
 
+const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+
+const server = http.createServer((req, res) => {
+  if (req.url === "/") {
+    res.writeHead(200, { "Content-Type": "text/plain" });
+    res.end("Bot is running");
+  }
+});
 
 
 (async () => {
@@ -38,7 +42,14 @@ const client = new Client({
 });
 
 client.initialize();
+server.listen(port, () => {
+  console.log(`🌐 HTTP server listening on port ${port}`);
+});
 
+// Pasás una función que agrega handlers
+showQr(client, (handler) => {
+  server.on("request", handler); // Hookeás el nuevo handler a las requests
+});
 client.on("authenticated", () => {
   console.log("🔐 Autenticado con éxito.");
 });
@@ -50,11 +61,8 @@ client.on("auth_failure", (msg) => {
 client.on("disconnected", (reason) => {
   console.warn("⚠️ Desconectado:", reason);
 });
-client.on("qr", (qr) => {
-	const lastedQR = qr;
-	showQr(client,port , qr);
-  qrcode.generate(qr, { small: true });
-});
+
+
 
 client.on("ready", () => {
   console.log(client.info);

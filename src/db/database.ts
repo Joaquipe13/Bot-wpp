@@ -36,6 +36,15 @@ class DatabaseManager {
 			password: DB_PASSWORD ? "********" : "no password provided",
 		});
 	try {
+		const tempConnection = await mysql.createConnection({
+			host: DB_HOST,
+			port: parseInt(DB_PORT || "3306", 10),
+			user: DB_USER,
+			password: DB_PASSWORD,
+		});
+
+		await tempConnection.query(`CREATE DATABASE IF NOT EXISTS \`${DB_DATABASE}\`;`);
+      	await tempConnection.end();
 		
       	this.connection = await mysql.createConnection({
 			host: DB_HOST,
