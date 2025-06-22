@@ -2,7 +2,6 @@ import qrcode from "qrcode-terminal";
 import { Client, LocalAuth, Message } from "whatsapp-web.js";
 import { pingCommand } from "./commands/ping";
 import DatabaseManager from "./db/database";
-import { log } from "./utils/logger";
 import TopAntipala from "./classes/topAntipala";
 import { topDiarioCommand } from "./commands/topDiario";
 import http from 'http';
@@ -17,7 +16,7 @@ http.createServer((_, res) => {
 (async () => {
   try {
     const dbManager = await DatabaseManager.getInstance();
-    const db = dbManager.getDB();
+    const db = dbManager.getConnection();
 
     console.log("✅ Base de datos lista y bot inicializado");
   } catch (error) {

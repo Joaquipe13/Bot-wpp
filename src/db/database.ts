@@ -1,9 +1,13 @@
-import sqlite3 from "sqlite3";
-import { open, Database } from "sqlite";
+import mysql from "mysql2/promise";
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const {DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_DATABASE} = process.env;
 
 class DatabaseManager {
   private static instance: DatabaseManager;
-  private db: Database | null = null;
+  private connection: mysql.Connection | null = null;
 
   private constructor() {}
 
@@ -14,49 +18,60 @@ class DatabaseManager {
     }
     return DatabaseManager.instance;
   }
+
   public static clearInstance(): DatabaseManager {
     if (DatabaseManager.instance) {
-      DatabaseManager.instance.db?.close();
+      DatabaseManager.instance.connection?.end();
       DatabaseManager.instance = new DatabaseManager();
     }
     return DatabaseManager.instance;
   }
 
   private async init() {
-    this.db = await open({
-      filename: "./bot-database.db",
-      driver: sqlite3.Database,
-    });
+    try {
+      this.connection = await mysql.createConnection({
+        host: DB_HOST,
+        port: parseInt(DB_PORT || "3306", 10),
+        user: DB_USER,
+        password: DB_PASSWORD,
+        database: DB_DATABASE,
+      });
 
-    // Definición de tablas
-    await this.db.exec(`
+      await this.connection.execute(`
+        CREATE TABLE IF NOT EXISTS top_diarios (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          fecha VARCHAR(255) NOT NULL
+        );
+      `);
 
-      CREATE TABLE IF NOT EXISTS top_diarios (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        fecha TEXT NOT NULL
-      );
+      await this.connection.execute(`
+        CREATE TABLE IF NOT EXISTS toperos (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          name VARCHAR(255) NOT NULL UNIQUE
+        );
+      `);
 
-      CREATE TABLE IF NOT EXISTS top_diario_toperos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        top_diario_id INTEGER NOT NULL,
-        topero_id INTEGER NOT NULL,
-        posicion INTEGER NOT NULL,
-        puntos INTEGER NOT NULL,
-        FOREIGN KEY(top_diario_id) REFERENCES top_diarios(id),
-        FOREIGN KEY(topero_id) REFERENCES scores(id)
-      );
-      CREATE TABLE IF NOT EXISTS toperos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL UNIQUE
-      );
-    `);
+      await this.connection.execute(`
+        CREATE TABLE IF NOT EXISTS top_diario_toperos (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          top_diario_id INT NOT NULL,
+          topero_id INT NOT NULL,
+          posicion INT NOT NULL,
+          puntos INT NOT NULL,
+          FOREIGN KEY (top_diario_id) REFERENCES top_diarios(id),
+          FOREIGN KEY (topero_id) REFERENCES toperos(id)
+        );
+      `);
+    }catch (error) {
+      throw new Error("❌ Error conectando a la base de datos");
+    }
   }
 
-  public getDB(): Database {
-    if (!this.db) {
+  public getConnection(): mysql.Connection {
+    if (!this.connection) {
       throw new Error("❌ Database no inicializada.");
     }
-    return this.db;
+    return this.connection;
   }
 }
 
