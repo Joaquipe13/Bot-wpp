@@ -69,7 +69,7 @@ client.on("message", async (msg) => {
     return;
   }
 
-  if (body.startsWith("Top antipala del dia")) {
+  if (body.startsWith("/Top antipala del dia")) {
     try {
       const { nombres, fecha } = parseTop(body);
       const topAntipala = TopAntipala.getInstance();

@@ -50,10 +50,12 @@ class TopAntipala {
     }
 
     const placeholders = nombres.map(() => "?").join(",");
-    const [rows] = await db.query<RowDataPacket[]>(
-      `SELECT id, name FROM toperos WHERE name IN (${placeholders})`,
-      nombres
-    );
+	const query = `
+	SELECT id, name FROM toperos
+	WHERE name IN (${placeholders})
+	ORDER BY FIELD(name, ${placeholders})
+	`;
+	const [rows] = await db.query<RowDataPacket[]>(query, [...nombres, ...nombres]);
     const results = rows as Array<{  id: number; name: string}>;
 
     const encontrados = results.map((results) => new Topero(results.id, results.name));
@@ -70,6 +72,7 @@ class TopAntipala {
     if (faltantes.length > 0) {
       throw new Error(`❌ Flasheaste cualquiera con: ${faltantes.join(", ")}.\nEscribi bien mogolico.`);
     }
+	console.log(encontrados);
     return encontrados;
   }
 
