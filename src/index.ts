@@ -27,7 +27,10 @@ http.createServer((_, res) => {
 
 const client = new Client({
   authStrategy: new LocalAuth(),
-  puppeteer: { headless: true },
+  puppeteer: { 
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+   },
 });
 
 client.initialize();
