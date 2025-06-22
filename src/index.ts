@@ -16,7 +16,7 @@ http.createServer((_, res) => {
 (async () => {
   try {
     const dbManager = await DatabaseManager.getInstance();
-    const db = dbManager.getConnection();
+    const db = dbManager.getDB();
 
     console.log("✅ Base de datos lista y bot inicializado");
   } catch (error) {

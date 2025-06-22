@@ -67,7 +67,7 @@ class DatabaseManager {
     }
   }
 
-  public getConnection(): mysql.Connection {
+  public getDB(): mysql.Connection {
     if (!this.connection) {
       throw new Error("❌ Database no inicializada.");
     }

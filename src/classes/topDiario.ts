@@ -1,5 +1,7 @@
 import Topero from './topero';
 import DatabaseManager from '../db/database';
+import type { OkPacket } from 'mysql2';
+
 
 class TopDiario {
   fecha: Date;
@@ -14,7 +16,7 @@ private readonly MAX_RETRIES = 3;
     const dbManager = await DatabaseManager.getInstance();
     const db = dbManager.getDB();
 
-    await db.run("BEGIN TRANSACTION");
+    await db.beginTransaction();
 
     let attempts = 0;
 
@@ -23,24 +25,24 @@ private readonly MAX_RETRIES = 3;
         const dbManager = await DatabaseManager.getInstance();
         const db = dbManager.getDB();
 
-        await db.run("BEGIN TRANSACTION");
+        await db.execute("BEGIN TRANSACTION");
 
-        const result = await db.run(
+        const [result] = await db.execute<OkPacket>(
           `INSERT INTO top_diarios (fecha) VALUES (?)`,
           [this.fecha.toISOString()]
         );
 
-        const topDiarioId = result.lastID;
+        const topDiarioId = result.insertId;
         const topLength = this.toperos.length;
         for (let i = 0; i < topLength; i++) {
           const topero = this.toperos[i];
-          await db.run(
+          await db.execute(
             `INSERT INTO top_diario_toperos (top_diario_id, topero_id, posicion, puntos) VALUES (?, ?, ?, ?)`,
             [topDiarioId, topero.id, i + 1, topLength - i]
           );
         }
 
-        await db.run("COMMIT");
+        await db.commit();
         return; 
 
       } catch (error) {
@@ -48,7 +50,7 @@ private readonly MAX_RETRIES = 3;
         try {
           const dbManager = await DatabaseManager.getInstance();
           const db = dbManager.getDB();
-          await db.run("ROLLBACK");
+          await db.rollback();
         } catch {
         }
         if (attempts >= this.MAX_RETRIES) {

@@ -2,6 +2,7 @@
 import  Topero  from "../classes/topero";
 import capitalize from "../utils/capitalize";
 import DatabaseManager from "../db/database";
+import { RowDataPacket } from "mysql2";
 
 class TopAntipala {
   private static instance: TopAntipala;
@@ -21,20 +22,21 @@ class TopAntipala {
   public async getTopAntipala(): Promise<string> {
   const db = await this.getDB();
 
-  const rows = await db.all(`
+  const [rows] = await db.query<RowDataPacket[]>(`
     SELECT t.name, SUM(tdt.puntos) AS total_points
     FROM top_diario_toperos tdt
     JOIN toperos t ON tdt.topero_id = t.id
     GROUP BY tdt.topero_id
     ORDER BY total_points DESC;
   `);
-  if (rows.length === 0) {
+  const results = rows as Array<{ name: string; total_points: number }>;
+  if (results.length === 0) {
     return "📉 No hay registros aún para el Top Antipala.";
   }
 
   let mensaje = "🔝 Top Antipala:\n";
-  rows.forEach((row, index) => {
-    mensaje += `${index + 1}. ${row.name} (${row.total_points} pts)\n`;
+  results.forEach((results, index) => {
+    mensaje += `${index + 1}. ${results.name} (${results.total_points} pts)\n`;
   });
 
   return mensaje.trim();
@@ -48,12 +50,13 @@ class TopAntipala {
     }
 
     const placeholders = nombres.map(() => "?").join(",");
-    const rows = await db.all(
+    const [rows] = await db.query<RowDataPacket[]>(
       `SELECT id, name FROM toperos WHERE name IN (${placeholders})`,
       nombres
     );
+    const results = rows as Array<{  id: number; name: string}>;
 
-    const encontrados = rows.map((row: any) => new Topero(row.id, row.name));
+    const encontrados = results.map((results) => new Topero(results.id, results.name));
 
     
     const encontradosSet = new Set(
