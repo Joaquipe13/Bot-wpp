@@ -35,8 +35,10 @@ const client = new Client({
 
 client.initialize();
 server.listen(port, () => {
-  console.log(`🌐 HTTP server listening on port ${port}`);
+  const url = process.env.RAILWAY_STATIC_URL || `http://localhost:${port}`;
+  console.log(`🌐 Escuchando en: ${url}`);
 });
+
 
 showQr(client, (handler) => {
   server.on("request", handler); // se encarga del QR y del mensaje fallback
