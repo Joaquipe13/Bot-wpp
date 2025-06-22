@@ -29,13 +29,21 @@ class DatabaseManager {
 
   private async init() {
     try {
-      this.connection = await mysql.createConnection({
-        host: DB_HOST,
-        port: parseInt(DB_PORT || "3306", 10),
-        user: DB_USER,
-        password: DB_PASSWORD,
-        database: DB_DATABASE,
-      });
+		console.log("➡️ Intentando conectar con:", {
+			host: DB_HOST,
+			port: DB_PORT,
+			user: DB_USER,
+			database: DB_DATABASE,
+			password: DB_PASSWORD ? "********" : "no password provided",
+		});
+      	this.connection = await mysql.createConnection({
+			host: DB_HOST,
+			port: parseInt(DB_PORT || "3306", 10),
+			user: DB_USER,
+			password: DB_PASSWORD,
+			database: DB_DATABASE,
+		});
+	  
 
       await this.connection.execute(`
         CREATE TABLE IF NOT EXISTS top_diarios (
@@ -63,8 +71,9 @@ class DatabaseManager {
         );
       `);
     }catch (error) {
-      throw new Error("❌ Error conectando a la base de datos");
-    }
+  		console.error("❌ Error conectando a la base de datos:", error);
+  		throw error; // o no lo tires, y dejá que se maneje más arriba
+	}
   }
 
   public getDB(): mysql.Connection {
