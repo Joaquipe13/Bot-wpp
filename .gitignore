@@ -1,0 +1,36 @@
+# Node
+node_modules/
+package-lock.json
+npm-debug.log*
+yarn.lock
+
+# TypeScript build
+dist/
+*.tsbuildinfo
+
+# VS Code
+.vscode/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de entorno/local
+.env
+.env.local
+
+# Sesiones de WhatsApp (MUY importante)
+.wwebjs_auth/
+
+# Logs
+logs/
+*.log
+
+# SQLite DB si no querés subirla al repo
+*.db
+
+# Tsc-watch
+tsc-watch.log
+
+.prettierignore
+.prettierrc
