@@ -26,8 +26,7 @@ Thumbs.db
 logs/
 *.log
 
-# SQLite DB si no querés subirla al repo
-*.db
+
 
 # Tsc-watch
 tsc-watch.log
