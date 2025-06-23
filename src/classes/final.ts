@@ -34,7 +34,7 @@ class Final {
 		const db = await this.getDB();
 		try {
 			await db.execute(
-			`INSERT INTO finales (date_top, nota, materia, puntos, topero_id) VALUES (?, ?, ?, ?, ?)`,
+			`INSERT INTO finales (date_top, nota, materia, points, topero_id) VALUES (?, ?, ?, ?, ?)`,
 			[
 				this.date_top.toISOString().slice(0, 10),
 				this.nota,

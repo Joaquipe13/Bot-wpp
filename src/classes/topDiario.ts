@@ -29,7 +29,7 @@ class TopDiario {
 			for (let i = 0; i < topLength; i++) {
 				const topero = this.toperos[i];
 				await conn.execute(
-				`INSERT INTO top_diario_toperos (top_diario_id, topero_id, posicion, puntos) VALUES (?, ?, ?, ?)`,
+				`INSERT INTO top_diario_toperos (top_diario_id, topero_id, posicion, points) VALUES (?, ?, ?, ?)`,
 				[topDiarioId, topero.id, i + 1, topLength - i]
 				);
 			}
