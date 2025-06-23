@@ -5,7 +5,7 @@ import parseTop from "./utils/parseTop";
 import showQr from "./utils/showQr";
 import dotenv from "dotenv";
 import http from "http";
-import { topDiarioCommand, pingCommand, loroCommand, showAllTopsCommand, showTopOfCommand, uploadFinalCommand} from "./commands";
+import { topDiarioCommand, pingCommand, audioCommand, showAllTopsCommand, showTopOfCommand, uploadFinalCommand} from "./commands";
 
 dotenv.config();
 
@@ -113,15 +113,17 @@ client.on("message", async (msg) => {
 		}
 	}
 	 
-	if(body.startsWith("/loro")) {
+	if(body.startsWith("/loro")||body.startsWith("/maxi") || body.startsWith("/munne") || body.startsWith("/nico")) {
 		try {
-			const media = await loroCommand();
+			const file: string = body.replace("/", "");
+			const media = await audioCommand(file);
 			await client.sendMessage(msg.from, media, {
     			sendAudioAsVoice: true
   			});
 		}catch (error: any) {
-			await msg.reply(error.message || "❌ Error al obtener el loro.");
+			await msg.reply(error.message || "❌ Error al obtener el audio.");
 		}
 	}
+
   }
 );
