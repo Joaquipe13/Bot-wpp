@@ -3,8 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { Message, Client, MessageMedia } from 'whatsapp-web.js';
 
-export async function loroCommand(msg: Message, client: Client) {
-	
+export async function loroCommand() {
   const carpeta = path.join(__dirname, './../../audios/loro');
   const archivos = fs.readdirSync(carpeta).filter(file => file.endsWith('.opus'));
   if (archivos.length === 0) {
@@ -16,8 +15,6 @@ export async function loroCommand(msg: Message, client: Client) {
   const buffer = fs.readFileSync(ruta);
   const base64Audio = buffer.toString('base64');
   const media = new MessageMedia('audio/ogg; codecs=opus', base64Audio, 'loro.opus');
-  await client.sendMessage(msg.from, media, {
-    sendAudioAsVoice: true
-  });
+  return media
 }
 export default loroCommand;

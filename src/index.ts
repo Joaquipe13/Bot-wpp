@@ -72,7 +72,7 @@ client.on("message", async (msg) => {
     pingCommand(msg);
     return;
   }
-
+/* 
 	if (body.startsWith("Top antipala del dia")) {
 		try {
 			const { nombres, date } = parseTop(body);
@@ -117,9 +117,13 @@ client.on("message", async (msg) => {
 			await msg.reply(error.message || "❌ Error al cargar un final.");
 		}
 	}
+	 */
 	if(body.startsWith("/loro")) {
 		try {
-			await loroCommand(msg, client);
+			const media = await loroCommand();
+			await client.sendMessage(msg.from, media, {
+    			sendAudioAsVoice: true
+  			});
 		}catch (error: any) {
 			await msg.reply(error.message || "❌ Error al obtener el loro.");
 		}
