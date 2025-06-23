@@ -103,6 +103,34 @@ class TopAntipala {
   	return rows.map((row) => row.top_texto as string);
 
   }
+  public async getTopAntipalaByDate(fecha: string): Promise<string> {
+	const db = await this.getDB();
+	const fechaDate = new Date(fecha);
+	if (isNaN(fechaDate.getTime())) {
+	  throw new Error("❌ Fecha inválida. Usa el formato YYYY-MM-DD.");
+	}
+	const [rows] = await db.query<RowDataPacket[]>(`
+	  SELECT 
+		t.name,
+		dt.puntos
+	  FROM top_diario_toperos dt
+	  JOIN top_diarios d ON d.id = dt.top_diario_id
+	  JOIN toperos t ON t.id = dt.topero_id
+	  WHERE d.fecha = ?
+	  ORDER BY dt.posicion;
+	`, [fechaDate.toISOString().split("T")[0]]);
+
+	if (rows.length === 0) {
+	  return `📉 No hay registros para el Top Antipala del ${fechaDate.toISOString().split("T")[0]}.`;
+	}
+
+	let mensaje = `🔝 Top Antipala del ${fechaDate.toISOString().split("T")[0]}:\n`;
+	rows.forEach((row, index) => {
+	  mensaje += `${index + 1}. ${row.name} (${row.puntos} pts)\n`;
+	});
+
+	return mensaje.trim();
+  }
 
 
 }
