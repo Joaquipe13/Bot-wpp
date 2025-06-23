@@ -9,6 +9,7 @@ import dotenv from "dotenv";
 import http from "http";
 import showAllTops from "./commands/showAllTops";
 import uploadFinal from "./commands/uploadFinal";
+import loroCommand from "./commands/loro";
 
 dotenv.config();
 
@@ -78,10 +79,10 @@ client.on("message", async (msg) => {
       
       const toperos = await topAntipala.validarUsuariosExistentes(nombres);
 
-      await topDiarioCommand(toperos, fecha);
+      await topDiarioCommand(toperos, date);
       const reply = await topAntipala.getTopAntipala();
       await msg.reply(reply);
-      console.log(`📊 Top ${fecha.toISOString()} enviado.`);
+      console.log(`📊 Top ${date.toISOString()} enviado.`);
     } catch (error: any) {
       await msg.reply(error.message || "❌ Error al procesar el top.");
     }
@@ -116,6 +117,15 @@ client.on("message", async (msg) => {
 	} catch (error: any) {
 	  await msg.reply(error.message || "❌ Error al cargar un final.");
 	}
-}
-
-});
+	
+	}
+	 */
+	if(body.startsWith("/loro")) {
+		try {
+			await loroCommand(msg, client);
+		}catch (error: any) {
+			await msg.reply(error.message || "❌ Error al obtener el loro.");
+		}
+		}
+  }
+);
