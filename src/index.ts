@@ -112,16 +112,19 @@ client.on("message", async (msg) => {
 			await msg.reply(error.message || "❌ Error al cargar un final.");
 		}
 	}
-	 
-	if(body.startsWith("/loro")||body.startsWith("/maxi") || body.startsWith("/munne") || body.startsWith("/nico")) {
-		try {
-			const file: string = body.replace("/", "");
-			const media = await audioCommand(file);
-			await client.sendMessage(msg.from, media, {
-    			sendAudioAsVoice: true
-  			});
-		}catch (error: any) {
-			await msg.reply(error.message || "❌ Error al obtener el audio.");
+	const audios = ["loro", "maxi", "munne", "nico"];
+ 
+	if(body.startsWith("/")) {
+		const file = body.slice(1);
+		if (audios.includes(file)) {
+			try {
+				const media = await audioCommand(file);
+				await client.sendMessage(msg.from, media, {
+					sendAudioAsVoice: true
+				});
+			}catch (error: any) {
+				await msg.reply(error.message || "❌ Error al obtener el audio.");
+			}
 		}
 	}
 
