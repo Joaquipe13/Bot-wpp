@@ -11,6 +11,5 @@ async function showAllTops(): Promise<string[]> {
     } catch (error:any) {
         throw new Error(error.message);
     }    
-    
 };
 export default showAllTops;
