@@ -96,14 +96,7 @@ client.on("message", async (msg) => {
       await msg.reply(error.message || "❌ Error al obtener el top.");
     }
   }
-		else if (parts.length === 2) {
-			const date = parts[1];
-			try {
-				const reply = await showTopOf(date);
-				await msg.reply(reply);
-			} catch (error: any) {
-				await msg.reply(error.message || "❌ Error al obtener el top para esa fecha.");
-			}
+		
   if (body.startsWith("/topdiario")) {
 	try {
 	  	const tops = await showAllTops();
