@@ -4,11 +4,11 @@ import type { OkPacket } from 'mysql2';
 
 
 class TopDiario {
-  date: string;
+  date_top: string;
   toperos: Topero[];
 
-  constructor(date: Date, toperos: Topero[]) {
-    this.date = date.toISOString().slice(0, 10);
+  constructor(date_top: Date, toperos: Topero[]) {
+    this.date_top = date_top.toISOString().slice(0, 10);
     this.toperos = toperos;
 	}
 	async save(): Promise<void> {
@@ -20,8 +20,8 @@ class TopDiario {
 			await conn.beginTransaction();
 
 			const [result] = await conn.execute<OkPacket>(
-				`INSERT INTO top_diarios (date) VALUES (?)`, 
-				[this.date]
+				`INSERT INTO top_diarios (date_top) VALUES (?)`, 
+				[this.date_top]
 			);
 			const topDiarioId = result.insertId;
 			const topLength = this.toperos.length;

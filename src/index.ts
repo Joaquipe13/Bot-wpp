@@ -41,7 +41,7 @@ server.listen(port, () => {
 
 
 showQr(client, (handler) => {
-  server.on("request", handler); // se encarga del QR y del mensaje fallback
+  server.on("request", handler); 
 });
 
 client.on("authenticated", () => {
@@ -71,29 +71,18 @@ client.on("message", async (msg) => {
 
 	if (body.startsWith("Top antipala del dia")) {
 		try {
-			const { nombres, date } = parseTop(body);
+			const { nombres, date_top } = parseTop(body);
 			const toperos = await topAntipala.validarUsuariosExistentes(nombres);
-			await topDiarioCommand(toperos, date);
+			await topDiarioCommand(toperos, date_top);
 			const reply = await topAntipala.getTopAntipala();
 			await msg.reply(reply);
-			console.log(`📊 Top ${date.toISOString()} enviado.`);
+			console.log(`📊 Top ${date_top.toISOString()} enviado.`);
 		} catch (error: any) {
 			await msg.reply(error.message || "❌ Error al procesar el top.");
 		}
 		return;
 	}
-
-  if (body.startsWith("/top")) {
-    try {
-      
-      const reply = await topAntipala.getTopAntipala();
-      await msg.reply(reply);
-    } catch (error: any) {
-      await msg.reply(error.message || "❌ Error al obtener el top.");
-    }
-  }
-		
-  if (body.startsWith("/topdiario")) {
+	if (body.startsWith("/topdiario")) {
 	try {
 	  	const tops = await showAllTopsCommand();
 	  	await msg.reply(tops.join("\n\n"));
@@ -101,6 +90,16 @@ client.on("message", async (msg) => {
 	  	await msg.reply(error.message || "❌ Error al obtener el top diario.");
 	}
   }
+  if (body ==="/top" ) {
+    try {
+      const reply = await topAntipala.getTopAntipala();
+      await msg.reply(reply);
+    } catch (error: any) {
+      await msg.reply(error.message || "❌ Error al obtener el top.");
+    }
+  }
+		
+  
 	if (body.startsWith("/final")) {
 		console.log("📥 Subiendo un final...");
 		try {
