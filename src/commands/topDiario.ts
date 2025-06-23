@@ -1,8 +1,5 @@
-import  TopAntipala  from "../classes/topAntipala";
 import TopDiario from "../classes/topDiario";
 import Topero from "../classes/topero";
-
-const topAntipala = TopAntipala.getInstance();
 
 
 export async function topDiarioCommand(toperos:Topero[], date:Date): Promise<void> {

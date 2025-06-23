@@ -49,7 +49,7 @@ class DatabaseManager {
       await conn.execute(`
         CREATE TABLE IF NOT EXISTS top_diarios (
           id INT AUTO_INCREMENT PRIMARY KEY,
-          date VARCHAR(255) NOT NULL
+          date_top VARCHAR(255) NOT NULL
         );
       `);
       await conn.execute(`
@@ -64,7 +64,7 @@ class DatabaseManager {
           top_diario_id INT NOT NULL,
           topero_id INT NOT NULL,
           posicion INT NOT NULL,
-          puntos INT NOT NULL,
+          points INT NOT NULL,
           FOREIGN KEY (top_diario_id) REFERENCES top_diarios(id),
           FOREIGN KEY (topero_id) REFERENCES toperos(id)
         );
@@ -73,10 +73,10 @@ class DatabaseManager {
         CREATE TABLE IF NOT EXISTS finales (
           id INT AUTO_INCREMENT PRIMARY KEY,
           topero_id INT NOT NULL,
-          date DATE NOT NULL,
+          date_top DATE NOT NULL,
           nota INT NOT NULL,
           materia VARCHAR(255) NOT NULL,
-          puntos INT NOT NULL,
+          points INT NOT NULL,
           FOREIGN KEY (topero_id) REFERENCES toperos(id)
         );
       `);

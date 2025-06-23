@@ -29,12 +29,12 @@ class TopAntipala {
 	COALESCE(tops.total_top_points, 0) - COALESCE(finals.total_final_points, 0) AS total_points
 	FROM toperos t
 	LEFT JOIN (
-	SELECT topero_id, SUM(puntos) AS total_top_points
+	SELECT topero_id, SUM(points) AS total_top_points
 	FROM top_diario_toperos
 	GROUP BY topero_id
 	) AS tops ON tops.topero_id = t.id
 	LEFT JOIN (
-	SELECT topero_id, SUM(puntos) AS total_final_points
+	SELECT topero_id, SUM(points) AS total_final_points
 	FROM finales
 	GROUP BY topero_id
 	) AS finals ON finals.topero_id = t.id
@@ -91,30 +91,30 @@ class TopAntipala {
 	const [rows] = await db.query<RowDataPacket[]>(`
 		SELECT 
 		CONCAT(
-			'Top antipala del dia ', d.date, ':\n',
+			'Top antipala del dia ', d.date_top, ':\n',
 			GROUP_CONCAT(CONCAT(dt.posicion, ' ', t.name) ORDER BY dt.posicion SEPARATOR '\n')
 		) AS top_texto
 		FROM top_diario_toperos dt
 		JOIN top_diarios d ON d.id = dt.top_diario_id
 		JOIN toperos t ON t.id = dt.topero_id
-		GROUP BY d.date
-		ORDER BY d.date DESC
+		GROUP BY d.date_top
+		ORDER BY d.date_top DESC
 	`);
 
   	return rows.map((row) => row.top_texto as string);
 
   }
-  public async getTopAntipalaByDate(date: string): Promise<string> {
+  public async getTopAntipalaByDate(date_top: string): Promise<string> {
 	const db = await this.getDB();
-	const dateParsed = parseDate(date);
+	const dateParsed = parseDate(date_top);
 	const [rows] = await db.query<RowDataPacket[]>(`
 	  SELECT 
 		t.name,
-		dt.puntos
+		dt.points
 	  FROM top_diario_toperos dt
 	  JOIN top_diarios d ON d.id = dt.top_diario_id
 	  JOIN toperos t ON t.id = dt.topero_id
-	  WHERE d.date = ?
+	  WHERE d.date_top = ?
 	  ORDER BY dt.posicion;
 	`, [dateParsed.toISOString().split("T")[0]]);
 
@@ -124,7 +124,7 @@ class TopAntipala {
 
 	let mensaje = `🔝 Top Antipala del ${dateParsed.toISOString().split("T")[0]}:\n`;
 	rows.forEach((row, index) => {
-	  mensaje += `${index + 1}. ${row.name} (${row.puntos} pts)\n`;
+	  mensaje += `${index + 1}. ${row.name} (${row.points} pts)\n`;
 	});
 
 	return mensaje.trim();

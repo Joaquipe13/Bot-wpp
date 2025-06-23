@@ -2,18 +2,18 @@ import DatabaseManager from '../db/database';
 import Topero from './topero';
 
 class Final {
-  date: Date;
+  date_top: Date;
   materia: string;
   nota: number;
   topero: Topero;
-  puntos: number;
+  points: number;
 
-  constructor(date: Date, topero: Topero, materia: string, nota: number) {
-    this.date = date;
+  constructor(date_top: Date, topero: Topero, materia: string, nota: number) {
+    this.date_top = date_top;
     this.topero = topero;
     this.materia = materia;
     this.nota = nota;
-	this.puntos = this.calculatePoints();
+	this.points = this.calculatePoints();
   }
 	private async getDB() {
 			const dbManager = await DatabaseManager.getInstance();
@@ -34,12 +34,12 @@ class Final {
 		const db = await this.getDB();
 		try {
 			await db.execute(
-			`INSERT INTO finales (date, nota, materia, puntos, topero_id) VALUES (?, ?, ?, ?, ?)`,
+			`INSERT INTO finales (date_top, nota, materia, puntos, topero_id) VALUES (?, ?, ?, ?, ?)`,
 			[
-				this.date.toISOString().slice(0, 10),
+				this.date_top.toISOString().slice(0, 10),
 				this.nota,
 				this.materia.trim(),
-				this.puntos,
+				this.points,
 				this.topero.id,
 			]
 			);
