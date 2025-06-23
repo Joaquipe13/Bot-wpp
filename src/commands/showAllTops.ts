@@ -4,7 +4,7 @@ import  TopAntipala  from "../classes/topAntipala";
 const topAntipala = TopAntipala.getInstance();
 
 
-async function showAllTops(): Promise<string[]> {
+export async function showAllTopsCommand(): Promise<string[]> {
     try {
         const tops = await topAntipala.getTopsList();
 		return tops;
@@ -12,4 +12,4 @@ async function showAllTops(): Promise<string[]> {
         throw new Error(error.message);
     }    
 };
-export default showAllTops;
+

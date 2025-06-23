@@ -1,3 +1,4 @@
+import { parseDate } from "./parseDate";
 
 function parseTop(body: string): { nombres: string[]; date: Date }   {
   const lines = body.split("\n").map((line) => line.trim());
@@ -9,7 +10,7 @@ function parseTop(body: string): { nombres: string[]; date: Date }   {
       }
 
       const [dia, mes, anio] = match[1].split("/");
-      const date = new Date(+anio, +mes - 1, +dia);
+      const date = parseDate(`${dia}/${mes}/${anio}`);
 
       const nombres: string[] = lines
         .slice(1)

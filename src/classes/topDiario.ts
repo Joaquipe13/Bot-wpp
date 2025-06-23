@@ -4,41 +4,46 @@ import type { OkPacket } from 'mysql2';
 
 
 class TopDiario {
-  fecha: string;
+  date: string;
   toperos: Topero[];
 
-  constructor(fecha: Date, toperos: Topero[]) {
-    this.fecha = fecha.toISOString().slice(0, 10);
+  constructor(date: Date, toperos: Topero[]) {
+    this.date = date.toISOString().slice(0, 10);
     this.toperos = toperos;
 	}
 	async save(): Promise<void> {
+		const dbManager = await DatabaseManager.getInstance();
+		const pool = dbManager.getDB();
+		const conn = await pool.getConnection();
+
 		try {
-			const dbManager = await DatabaseManager.getInstance();
-			const db = dbManager.getDB();
-			await db.beginTransaction();
-			const [result] = await db.execute<OkPacket>(
-				`INSERT INTO top_diarios (fecha) VALUES (?)`,
-				[this.fecha]
+			await conn.beginTransaction();
+
+			const [result] = await conn.execute<OkPacket>(
+				`INSERT INTO top_diarios (date) VALUES (?)`, 
+				[this.date]
 			);
 			const topDiarioId = result.insertId;
 			const topLength = this.toperos.length;
+
 			for (let i = 0; i < topLength; i++) {
 				const topero = this.toperos[i];
-				await db.execute(
+				await conn.execute(
 				`INSERT INTO top_diario_toperos (top_diario_id, topero_id, posicion, puntos) VALUES (?, ?, ?, ?)`,
 				[topDiarioId, topero.id, i + 1, topLength - i]
 				);
 			}
-			await db.commit();
-			return; 
 
-		}catch (error) {
-			if(error instanceof Error) {
-				console.log(error.message);
-			}
-			throw new Error(`❌ Error guardando TopDiario, suerte la proxima.`);
+			await conn.commit();
+		} catch (error) {
+			await conn.rollback();
+			console.error("❌ Error en transacción:", error);
+			throw new Error("❌ Error guardando TopDiario, suerte la próxima.");
+		} finally {
+			conn.release(); // 🔓 Importantísimo para liberar la conexión al pool
 		}
 	}
+
 }
 
 export default TopDiario;

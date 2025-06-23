@@ -1,15 +1,11 @@
 import { Client, LocalAuth } from "whatsapp-web.js";
-import { pingCommand } from "./commands/ping";
 import DatabaseManager from "./db/database";
 import TopAntipala from "./classes/topAntipala";
-import { topDiarioCommand } from "./commands/topDiario";
 import parseTop from "./utils/parseTop";
 import showQr from "./utils/showQr";
 import dotenv from "dotenv";
 import http from "http";
-import showAllTops from "./commands/showAllTops";
-import uploadFinal from "./commands/uploadFinal";
-import loroCommand from "./commands/loro";
+import { topDiarioCommand, pingCommand, loroCommand, showAllTopsCommand, showTopOfCommand, uploadFinalCommand} from "./commands";
 
 dotenv.config();
 
@@ -99,7 +95,7 @@ client.on("message", async (msg) => {
 		
   if (body.startsWith("/topdiario")) {
 	try {
-	  	const tops = await showAllTops();
+	  	const tops = await showAllTopsCommand();
 	  	await msg.reply(tops.join("\n\n"));
 	}catch (error: any) {
 	  	await msg.reply(error.message || "❌ Error al obtener el top diario.");
@@ -109,7 +105,7 @@ client.on("message", async (msg) => {
 		console.log("📥 Subiendo un final...");
 		try {
 			const content = msg.body.trim();
-			const reply = await uploadFinal(content)
+			const reply = await uploadFinalCommand(content)
 			await msg.reply(reply)
 			const top = await topAntipala.getTopAntipala();
 			await msg.reply(top)

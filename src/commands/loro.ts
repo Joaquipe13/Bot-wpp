@@ -17,4 +17,3 @@ export async function loroCommand() {
   const media = new MessageMedia('audio/ogg; codecs=opus', base64Audio, 'loro.opus');
   return media
 }
-export default loroCommand;

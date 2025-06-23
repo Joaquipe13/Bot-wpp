@@ -3,6 +3,7 @@ import  Topero  from "../classes/topero";
 import capitalize from "../utils/capitalize";
 import DatabaseManager from "../db/database";
 import { RowDataPacket } from "mysql2";
+import { parseDate } from "../utils/parseDate";
 
 class TopAntipala {
   private static instance: TopAntipala;
@@ -90,25 +91,22 @@ class TopAntipala {
 	const [rows] = await db.query<RowDataPacket[]>(`
 		SELECT 
 		CONCAT(
-			'Top antipala del dia ', d.fecha, ':\n',
+			'Top antipala del dia ', d.date, ':\n',
 			GROUP_CONCAT(CONCAT(dt.posicion, ' ', t.name) ORDER BY dt.posicion SEPARATOR '\n')
 		) AS top_texto
 		FROM top_diario_toperos dt
 		JOIN top_diarios d ON d.id = dt.top_diario_id
 		JOIN toperos t ON t.id = dt.topero_id
-		GROUP BY d.fecha
-		ORDER BY d.fecha DESC
+		GROUP BY d.date
+		ORDER BY d.date DESC
 	`);
 
   	return rows.map((row) => row.top_texto as string);
 
   }
-  public async getTopAntipalaByDate(fecha: string): Promise<string> {
+  public async getTopAntipalaByDate(date: string): Promise<string> {
 	const db = await this.getDB();
-	const fechaDate = new Date(fecha);
-	if (isNaN(fechaDate.getTime())) {
-	  throw new Error("❌ Fecha inválida. Usa el formato YYYY-MM-DD.");
-	}
+	const dateParsed = parseDate(date);
 	const [rows] = await db.query<RowDataPacket[]>(`
 	  SELECT 
 		t.name,
@@ -116,15 +114,15 @@ class TopAntipala {
 	  FROM top_diario_toperos dt
 	  JOIN top_diarios d ON d.id = dt.top_diario_id
 	  JOIN toperos t ON t.id = dt.topero_id
-	  WHERE d.fecha = ?
+	  WHERE d.date = ?
 	  ORDER BY dt.posicion;
-	`, [fechaDate.toISOString().split("T")[0]]);
+	`, [dateParsed.toISOString().split("T")[0]]);
 
 	if (rows.length === 0) {
-	  return `📉 No hay registros para el Top Antipala del ${fechaDate.toISOString().split("T")[0]}.`;
+	  return `📉 No hay registros para el Top Antipala del ${dateParsed.toISOString().split("T")[0]}.`;
 	}
 
-	let mensaje = `🔝 Top Antipala del ${fechaDate.toISOString().split("T")[0]}:\n`;
+	let mensaje = `🔝 Top Antipala del ${dateParsed.toISOString().split("T")[0]}:\n`;
 	rows.forEach((row, index) => {
 	  mensaje += `${index + 1}. ${row.name} (${row.puntos} pts)\n`;
 	});
