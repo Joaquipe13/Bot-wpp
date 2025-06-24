@@ -1,7 +1,7 @@
 import DatabaseManager from "../db/database";
 import { RowDataPacket } from 'mysql2';
 
-class Topero {
+export class Topero {
     id: number;
     name: string;
 
@@ -21,4 +21,3 @@ class Topero {
 	}
 
 }
-export default Topero;

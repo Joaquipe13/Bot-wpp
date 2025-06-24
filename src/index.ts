@@ -1,8 +1,7 @@
 import { Client, LocalAuth } from "whatsapp-web.js";
 import DatabaseManager from "./db/database";
-import TopAntipala from "./classes/topAntipala";
-import parseTop from "./utils/parseTop";
-import showQr from "./utils/showQr";
+import {TopAntipala, Commands} from "./classes";
+import {showQr} from "./utils";
 import dotenv from "dotenv";
 import http from "http";
 import { topDiarioCommand, pingCommand, audioCommand, showAllTopsCommand, showTopOfCommand, uploadFinalCommand} from "./commands";
@@ -17,13 +16,14 @@ const server = http.createServer(); // sin handler directo
   try {
     const dbManager = await DatabaseManager.getInstance();
     dbManager.getDB(); // conexión lista
-    console.log("✅ Base de datos lista y bot inicializado");
+    console.log("✅ Base de datos lista y bot inicializado")
   } catch (error) {
     console.error("❌ Error al iniciar:", error);
     process.exit(1);
   }
 })();
 const topAntipala = TopAntipala.getInstance();
+const commands = Commands.getInstance();
 
 const client = new Client({
   authStrategy: new LocalAuth(),
@@ -63,70 +63,74 @@ client.on("ready", () => {
 client.on("message", async (msg) => {
   const body = msg.body.trim();
   console.log(`📩 Mensaje recibido: ${body} de ${msg.from}`);
-
-  if (body.startsWith("/ping")) {
-    pingCommand(msg);
-    return;
-  }
-
 	if (body.startsWith("Top antipala del dia")) {
 		try {
-			const { nombres, date_top } = parseTop(body);
-			const toperos = await topAntipala.validarUsuariosExistentes(nombres);
-			await topDiarioCommand(toperos, date_top);
+			await topDiarioCommand(body, topAntipala);
 			const reply = await topAntipala.getTopAntipala();
 			await msg.reply(reply);
-			console.log(`📊 Top ${date_top.toISOString()} enviado.`);
 		} catch (error: any) {
 			await msg.reply(error.message || "❌ Error al procesar el top.");
 		}
 		return;
 	}
-	if (body.startsWith("/topdiario")) {
-	try {
-	  	const tops = await showAllTopsCommand();
-	  	await msg.reply(tops.join("\n\n"));
-	}catch (error: any) {
-	  	await msg.reply(error.message || "❌ Error al obtener el top diario.");
-	}
-  }
-  if (body ==="/top" ) {
-    try {
-      const reply = await topAntipala.getTopAntipala();
-      await msg.reply(reply);
-    } catch (error: any) {
-      await msg.reply(error.message || "❌ Error al obtener el top.");
-    }
-  }
-		
-  
-	if (body.startsWith("/final")) {
-		console.log("📥 Subiendo un final...");
+	if (body.startsWith("/")){
+		const command = body.split(" ")[0].slice(1).toLowerCase();
+		let exist = false;
 		try {
-			const content = msg.body.trim();
-			const reply = await uploadFinalCommand(content)
-			await msg.reply(reply)
-			const top = await topAntipala.getTopAntipala();
-			await msg.reply(top)
+			exist = commands.exists(command);
 		} catch (error: any) {
-			await msg.reply(error.message || "❌ Error al cargar un final.");
+			await msg.reply(error.message || "❌ Comando no reconocido.");
+			return
 		}
-	}
-	const audios = ["loro", "maxi", "munne", "nico"];
- 
-	if(body.startsWith("/")) {
-		const file = body.slice(1);
-		if (audios.includes(file)) {
-			try {
-				const media = await audioCommand(file);
-				await client.sendMessage(msg.from, media, {
-					sendAudioAsVoice: true
-				});
-			}catch (error: any) {
-				await msg.reply(error.message || "❌ Error al obtener el audio.");
+		if (exist) {
+			if (command ==="help") {
+				const helpMessage = commands.help();
+				await msg.reply(helpMessage);
+				return;
+			}
+			if (command ==="ping") {
+				pingCommand(msg);
+				return;
+			}
+			if (command ==="topdiario") {
+				try {
+					const tops = await showAllTopsCommand();
+					await msg.reply(tops.join("\n\n"));
+				}catch (error: any) {
+					await msg.reply(error.message || "❌ Error al obtener el top diario.");
+				}
+			}
+			if (command ==="top" ) {
+				try {
+				const reply = await topAntipala.getTopAntipala();
+				console.log("📥 Obteniendo el top antipala...");
+				await msg.reply(reply);
+				} catch (error: any) {
+				await msg.reply(error.message || "❌ Error al obtener el top.");
+				}
+			}
+			if (command ==="final") {
+				console.log("📥 Subiendo un final...");
+				try {
+					const content = msg.body.trim();
+					const reply = await uploadFinalCommand(content)
+					await msg.reply(reply)
+					const top = await topAntipala.getTopAntipala();
+					await msg.reply(top)
+				} catch (error: any) {
+					await msg.reply(error.message || "❌ Error al cargar un final.");
+				}
+			} 
+			if (command ==="play") {			
+				try {
+					const media = await audioCommand(body);
+					await client.sendMessage(msg.from, media, {
+						sendAudioAsVoice: true
+					});
+				}catch (error: any) {
+					await msg.reply(error.message || "❌ Error al obtener el audio.");
+				}
 			}
 		}
 	}
-
-  }
-);
+});

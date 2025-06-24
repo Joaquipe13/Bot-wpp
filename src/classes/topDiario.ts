@@ -1,9 +1,9 @@
-import Topero from './topero';
+import {Topero} from './topero';
 import DatabaseManager from '../db/database';
 import type { OkPacket } from 'mysql2';
 
 
-class TopDiario {
+export class TopDiario {
   date_top: string;
   toperos: Topero[];
 
@@ -45,5 +45,3 @@ class TopDiario {
 	}
 
 }
-
-export default TopDiario;

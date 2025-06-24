@@ -1,11 +1,10 @@
 
-import  TopAntipala  from "../classes/topAntipala";
-
-const topAntipala = TopAntipala.getInstance();
+import  {TopAntipala}  from "../classes";
 
 
 export async function showAllTopsCommand(): Promise<string[]> {
     try {
+		const topAntipala = TopAntipala.getInstance();
         const tops = await topAntipala.getTopsList();
 		return tops;
     } catch (error:any) {

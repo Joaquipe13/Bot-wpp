@@ -1,7 +1,7 @@
 import DatabaseManager from '../db/database';
-import Topero from './topero';
+import {Topero} from './topero';
 
-class Final {
+export class Final {
   date_top: Date;
   materia: string;
   nota: number;
@@ -50,4 +50,3 @@ class Final {
 	}
   
 }
-export default Final;

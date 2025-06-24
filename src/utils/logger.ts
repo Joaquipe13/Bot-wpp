@@ -1,4 +1,3 @@
-const log = (message: string) => {
+export const log = (message: string) => {
     console.log("[Bot]", message);
 };
-export default log;

@@ -26,7 +26,7 @@ class DatabaseManager {
         queueLimit: 0,
       });
 
-      // Aseguramos existencia de la DB (opcional, ya debería existir)
+      
       const tempConnection = await mysql.createConnection({
         host: DB_HOST,
         port: parseInt(DB_PORT || "3306", 10),

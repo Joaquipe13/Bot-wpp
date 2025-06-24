@@ -1,11 +1,10 @@
 
-import  Topero  from "../classes/topero";
-import capitalize from "../utils/capitalize";
+import  {Topero}  from "./topero";
+import {capitalize, parseDate} from "../utils";
 import DatabaseManager from "../db/database";
 import { RowDataPacket } from "mysql2";
-import { parseDate } from "../utils/parseDate";
 
-class TopAntipala {
+export class TopAntipala {
   private static instance: TopAntipala;
     private async getDB() {
         const dbManager = await DatabaseManager.getInstance();
@@ -132,4 +131,3 @@ class TopAntipala {
 
 
 }
-export default TopAntipala;

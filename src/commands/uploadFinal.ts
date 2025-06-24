@@ -1,5 +1,4 @@
-import Final from '../classes/final';
-import Topero from '../classes/topero';
+import {Final, Topero} from '../classes';
 import { parseDate } from '../utils/parseDate';
 export async function uploadFinalCommand(content:string): Promise<string> {
 	try {
