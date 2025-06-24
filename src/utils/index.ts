@@ -4,3 +4,4 @@ export {parseDate} from './parseDate';
 export {parseTop} from './parseTop';
 export { showQr } from './showQr';
 export { getFoldersInPath } from './getFoldersInPath';
+export {handleCommand} from './handleCommand';

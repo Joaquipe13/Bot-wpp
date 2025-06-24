@@ -1,136 +1,33 @@
-import { Client, LocalAuth } from "whatsapp-web.js";
 import DatabaseManager from "./db/database";
-import {TopAntipala, Commands} from "./classes";
-import {showQr} from "./utils";
 import dotenv from "dotenv";
 import http from "http";
-import { topDiarioCommand, pingCommand, audioCommand, showAllTopsCommand, showTopOfCommand, uploadFinalCommand} from "./commands";
-
-dotenv.config();
-
-const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
-
-const server = http.createServer(); // sin handler directo
-
-(async () => {
-  try {
-    const dbManager = await DatabaseManager.getInstance();
-    dbManager.getDB(); // conexión lista
-    console.log("✅ Base de datos lista y bot inicializado")
-  } catch (error) {
-    console.error("❌ Error al iniciar:", error);
-    process.exit(1);
-  }
-})();
-const topAntipala = TopAntipala.getInstance();
-const commands = Commands.getInstance();
-
-const client = new Client({
-  authStrategy: new LocalAuth(),
-  puppeteer: {
-    headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  },
-});
-
-client.initialize();
-server.listen(port, () => {
-  const url = process.env.RAILWAY_STATIC_URL || `http://localhost:${port}`;
-  console.log(`🌐 Escuchando en: ${url}`);
-});
+import { registerClientEvents, createClient } from "./bot";
 
 
-showQr(client, (handler) => {
-  server.on("request", handler); 
-});
+async function main() {
+	dotenv.config();
 
-client.on("authenticated", () => {
-  console.log("🔐 Autenticado con éxito.");
-});
+	const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
-client.on("auth_failure", (msg) => {
-  console.error("❌ Falló la autenticación:", msg);
-});
+	const server = http.createServer(); 
+	try {
+		const dbManager = await DatabaseManager.getInstance();
+		dbManager.getDB();
+		console.log("✅ Base de datos lista y bot inicializado");
 
-client.on("disconnected", (reason) => {
-  console.warn("⚠️ Desconectado:", reason);
-});
+		const client = createClient();
+		registerClientEvents(client, server);
+		client.initialize();
 
-client.on("ready", () => {
-  console.log(client.info);
-});
-
-client.on("message", async (msg) => {
-  const body = msg.body.trim();
-  console.log(`📩 Mensaje recibido: ${body} de ${msg.from}`);
-	if (body.startsWith("Top antipala del dia")) {
-		try {
-			await topDiarioCommand(body, topAntipala);
-			const reply = await topAntipala.getTopAntipala();
-			await msg.reply(reply);
-		} catch (error: any) {
-			await msg.reply(error.message || "❌ Error al procesar el top.");
-		}
-		return;
+		server.listen(port, () => {
+		const url = process.env.RAILWAY_STATIC_URL || `http://localhost:${port}`;
+		console.log(`🌐 Escuchando en: ${url}`);
+		});
+	} catch (error) {
+		console.error("❌ Error al iniciar:", error);
+		process.exit(1);
+		
 	}
-	if (body.startsWith("/")){
-		const command = body.split(" ")[0].slice(1).toLowerCase();
-		let exist = false;
-		try {
-			exist = commands.exists(command);
-		} catch (error: any) {
-			await msg.reply(error.message || "❌ Comando no reconocido.");
-			return
-		}
-		if (exist) {
-			if (command ==="help") {
-				const helpMessage = commands.help();
-				await msg.reply(helpMessage);
-				return;
-			}
-			if (command ==="ping") {
-				pingCommand(msg);
-				return;
-			}
-			if (command ==="topdiario") {
-				try {
-					const tops = await showAllTopsCommand();
-					await msg.reply(tops.join("\n\n"));
-				}catch (error: any) {
-					await msg.reply(error.message || "❌ Error al obtener el top diario.");
-				}
-			}
-			if (command ==="top" ) {
-				try {
-				const reply = await topAntipala.getTopAntipala();
-				console.log("📥 Obteniendo el top antipala...");
-				await msg.reply(reply);
-				} catch (error: any) {
-				await msg.reply(error.message || "❌ Error al obtener el top.");
-				}
-			}
-			if (command ==="final") {
-				console.log("📥 Subiendo un final...");
-				try {
-					const content = msg.body.trim();
-					const reply = await uploadFinalCommand(content)
-					await msg.reply(reply)
-					const top = await topAntipala.getTopAntipala();
-					await msg.reply(top)
-				} catch (error: any) {
-					await msg.reply(error.message || "❌ Error al cargar un final.");
-				}
-			} 
-			if (command ==="play") {			
-				try {
-					const media = await audioCommand(body);
-					await client.sendMessage(msg.from, media, {
-						sendAudioAsVoice: true
-					});
-				}catch (error: any) {
-					await msg.reply(error.message || "❌ Error al obtener el audio.");
-				}
-			}
-		}
-	}
-});
+}
+
+main();
