@@ -40,4 +40,4 @@ tsc-watch.log
 /.wwebjs_cache
 
 # audioManage
-/src/audioManage/convertOpusToOgg.ts
+/src/convertOpusToOgg.ts
