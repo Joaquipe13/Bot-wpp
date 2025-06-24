@@ -10,14 +10,13 @@ export async function audioCommand(body: string) {
 		if (args.length < 2) {
 			throw new Error(`Falta el argumento de audio. Audios disponibles: ${disponibles.join(", ")}`);
 		}
-		const audio = args[1].toLowerCase();
+		const audio = args[1];
 		if (!disponibles.includes(audio)) {
 			throw new Error(`El audio "${audio}" no está disponible. Audios disponibles: ${disponibles.join(", ")}`);
 		}
 		const folder = path.join(baseDir, audio);
 		const files = (await fs.readdir(folder)).filter(audio => audio.endsWith('.ogg'));
 		if (files.length === 0) {
-			
 			throw new Error(`❌ No hay audios del ${audio} disponibles.`);
 		}
 		const selectedFile = files[Math.floor(Math.random() * files.length)];

@@ -5,7 +5,6 @@ npm-debug.log*
 yarn.lock
 
 # TypeScript build
-dist/
 *.tsbuildinfo
 
 # VS Code
@@ -26,12 +25,13 @@ Thumbs.db
 logs/
 *.log
 
-#database
+# database
 bot-database.db
 
 # Tsc-watch
 tsc-watch.log
 
+# Config
 .prettierignore
 .prettierrc
 
@@ -39,5 +39,6 @@ tsc-watch.log
 /.wwebjs_auth
 /.wwebjs_cache
 
-# audioManage
+# Scripts solo locales
 /src/convertOpusToOgg.ts
+/dist/convertOpusToOgg.js
