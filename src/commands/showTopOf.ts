@@ -1,4 +1,4 @@
-import  TopAntipala  from "../classes/topAntipala";
+import  {TopAntipala}  from "../classes";
 
 export async function showTopOfCommand(date:string): Promise<string> {
 	const topAntipala = TopAntipala.getInstance();
