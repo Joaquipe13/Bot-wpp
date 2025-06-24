@@ -3,9 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.handleCommand = handleCommand;
 const commands_1 = require("../commands");
 const classes_1 = require("../classes");
-const topAntipala = classes_1.TopAntipala.getInstance();
-const commands = classes_1.Commands.getInstance();
 async function handleCommand(command, body, msg, client) {
+    const topAntipala = classes_1.TopAntipala.getInstance();
+    const commands = classes_1.Commands.getInstance();
     try {
         switch (command) {
             case "help":

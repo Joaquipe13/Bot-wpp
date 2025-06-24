@@ -2,10 +2,10 @@ import { Message } from 'whatsapp-web.js';
 import { audioCommand, pingCommand, showAllTopsCommand, uploadFinalCommand } from '../commands';
 import { TopAntipala, Commands } from '../classes';
 
-const topAntipala = TopAntipala.getInstance();
-const commands = Commands.getInstance();
 
 export async function handleCommand(command: string, body: string, msg: Message, client: any) {
+	const topAntipala = TopAntipala.getInstance();
+	const commands = Commands.getInstance();
 	try {
 		switch (command) {
 			case "help":
