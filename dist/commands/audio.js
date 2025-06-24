@@ -16,7 +16,7 @@ async function audioCommand(body) {
         if (args.length < 2) {
             throw new Error(`Falta el argumento de audio. Audios disponibles: ${disponibles.join(", ")}`);
         }
-        const audio = args[1].toLowerCase();
+        const audio = args[1];
         if (!disponibles.includes(audio)) {
             throw new Error(`El audio "${audio}" no está disponible. Audios disponibles: ${disponibles.join(", ")}`);
         }
