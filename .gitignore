@@ -38,7 +38,11 @@ tsc-watch.log
 # Web cache
 /.wwebjs_auth
 /.wwebjs_cache
+/session
+
 
 # Scripts solo locales
 /src/convertOpusToOgg.ts
 /dist/convertOpusToOgg.js
+
+
