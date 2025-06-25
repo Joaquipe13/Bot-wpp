@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.handleCommand = handleCommand;
 const commands_1 = require("../commands");
 const classes_1 = require("../classes");
+const deleteTopDiario_1 = require("../commands/deleteTopDiario");
 async function handleCommand(command, body, msg, client) {
     const topAntipala = classes_1.TopAntipala.getInstance();
     const commands = classes_1.Commands.getInstance();
@@ -47,6 +48,14 @@ async function handleCommand(command, body, msg, client) {
                 }
                 catch (err) {
                     return msg.reply(err.message || "❌ Error al obtener el audio.");
+                }
+            case "deletetop":
+                try {
+                    const reply = await (0, deleteTopDiario_1.deleteTopDiarioCommand)(body);
+                    await msg.reply(reply);
+                }
+                catch (err) {
+                    return msg.reply(err.message || "❌ Error al eliminar un top.");
                 }
         }
     }

@@ -31,7 +31,6 @@ export function registerClientEvents(client: Client, server: http.Server) {
   });
   client.on("message", async (msg) => {
 	const body = msg.body.trim();
-	console.log(`📩 Mensaje recibido: ${body} de ${msg.from}`);
   
 	if (body.startsWith("Top antipala del dia")) {
 	  try {
@@ -45,10 +44,12 @@ export function registerClientEvents(client: Client, server: http.Server) {
   
 	if (body.startsWith("/")) {
 	  const command = body.split(" ")[0].slice(1).toLowerCase();
-	  if (commands.exists(command)) {
-		return handleCommand(command, body, msg, client);
-	  } else {
-		return msg.reply("❌ Comando no reconocido.");
+	  try{
+		if (commands.exists(command)) {
+			return handleCommand(command, body, msg, client);
+		}
+	  } catch (error: any) {
+		return msg.reply(error.message || "❌ Error al procesar el comando.");
 	  }
 	}
   });
