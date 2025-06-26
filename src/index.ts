@@ -3,11 +3,11 @@ import dotenv from "dotenv";
 import http from "http";
 import { registerClientEvents, createClient } from "./bot";
 
+dotenv.config();
+const {APP_URL, RAILWAY_STATIC_URL, PORT} = process.env 
+const url = RAILWAY_STATIC_URL || APP_URL || `http://localhost:${PORT}`;
 
 async function main() {
-	dotenv.config();
-
-	const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
 	const server = http.createServer(); 
 	try {
@@ -19,9 +19,8 @@ async function main() {
 		registerClientEvents(client, server);
 		client.initialize();
 
-		server.listen(port, () => {
-		const url = process.env.RAILWAY_STATIC_URL || `http://localhost:${port}`;
-		console.log(`🌐 Escuchando en: ${url}`);
+		server.listen(PORT, () => {
+			console.log(`🌐 Escuchando en: ${url}`);
 		});
 	} catch (error) {
 		console.error("❌ Error al iniciar:", error);

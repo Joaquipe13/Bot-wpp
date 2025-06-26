@@ -42,6 +42,75 @@ class DatabaseManager {
         await DatabaseManager.instance.ensureConnection();
         return DatabaseManager.instance;
     }
+    async reconnectPool() {
+        let retries = 5;
+        while (retries > 0) {
+            try {
+                // Cerramos el pool viejo (importante)
+                await this.pool.end();
+                // Creamos un nuevo pool
+                this.pool = promise_1.default.createPool({
+                    host: DB_HOST,
+                    port: parseInt(DB_PORT || "3306", 10),
+                    user: DB_USER,
+                    password: DB_PASSWORD,
+                    database: DB_DATABASE,
+                    waitForConnections: true,
+                    connectionLimit: 10,
+                    queueLimit: 0,
+                });
+                console.log("✅ Pool reconectado!");
+                break;
+            }
+            catch {
+                retries--;
+                console.warn(`Intento de reconexión fallido. Reintentando en 3s... (${retries} intentos restantes)`);
+                await new Promise(res => setTimeout(res, 3000));
+            }
+        }
+        if (retries === 0) {
+            console.error("❌ No se pudo reconectar el pool de base de datos.");
+            process.exit(1);
+        }
+    }
+    async query(sql, params) {
+        let retries = 3;
+        while (retries > 0) {
+            try {
+                return await this.pool.query(sql, params);
+            }
+            catch (err) {
+                if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+                    console.warn("Conexión perdida durante query, reintentando...");
+                    await this.reconnectPool();
+                    retries--;
+                }
+                else {
+                    throw err;
+                }
+            }
+        }
+        throw new Error("No se pudo completar la query después de varios intentos.");
+    }
+    async execute(sql, params) {
+        let retries = 3;
+        while (retries > 0) {
+            try {
+                return await this.pool.execute(sql, params);
+            }
+            catch (error) {
+                if (error.code === 'PROTOCOL_CONNECTION_LOST' || error.code === 'ECONNRESET') {
+                    console.warn("Conexión perdida en execute, recreando pool y reintentando...");
+                    await this.reconnectPool();
+                    retries--;
+                }
+                else {
+                    throw error;
+                }
+            }
+        }
+        throw new Error("No se pudo completar el execute después de varios intentos.");
+    }
     async ensureConnection() {
         let retries = 5;
         let connected = false;

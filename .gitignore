@@ -44,6 +44,6 @@ tsc-watch.log
 /dist/convertOpusToOgg.js
 
 # Ignorás el código fuente y configs de TS
-src/
+/src
 tsconfig.json
 tsconfig.*.json
