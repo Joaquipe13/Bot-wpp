@@ -34,30 +34,5 @@ class TopDiario {
             conn.release(); // 🔓 Importantísimo para liberar la conexión al pool
         }
     }
-    static async delete(date) {
-        const dbManager = await database_1.default.getInstance();
-        const pool = dbManager.getDB();
-        const conn = await pool.getConnection();
-        try {
-            await conn.beginTransaction();
-            const [rows] = await conn.execute(`SELECT id FROM top_diarios WHERE date_top = ?`, [date]);
-            if (rows.length === 0) {
-                throw new Error(`🔎 No se encontró top_diario con fecha ${date}`);
-            }
-            const topDiarioId = rows[0].id;
-            await conn.execute(`DELETE FROM top_diario_toperos WHERE top_diario_id = ?`, [topDiarioId]);
-            await conn.execute(`DELETE FROM top_diarios WHERE id = ?`, [topDiarioId]);
-            await conn.commit();
-            console.log(`🗑️ TopDiario del ${date} eliminado exitosamente.`);
-        }
-        catch (error) {
-            await conn.rollback();
-            console.error("❌ Error al eliminar TopDiario:", error);
-            throw new Error("❌ Error eliminando el TopDiario. Que no se repita.");
-        }
-        finally {
-            conn.release();
-        }
-    }
 }
 exports.TopDiario = TopDiario;

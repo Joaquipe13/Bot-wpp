@@ -19,6 +19,8 @@ async function main() {
         (0, bot_1.registerClientEvents)(client, server);
         client.initialize();
         server.listen(port, () => {
+            const url = process.env.RAILWAY_STATIC_URL || `http://localhost:${port}`;
+            console.log(`🌐 Escuchando en: ${url}`);
         });
     }
     catch (error) {
