@@ -25,6 +25,7 @@ function registerClientEvents(client, server) {
     });
     client.on("message", async (msg) => {
         const body = msg.body.trim();
+        console.log(`📩 Mensaje recibido: ${body} de ${msg.from}`);
         if (body.startsWith("Top antipala del dia")) {
             try {
                 await (0, commands_1.topDiarioCommand)(body, topAntipala);
@@ -37,13 +38,11 @@ function registerClientEvents(client, server) {
         }
         if (body.startsWith("/")) {
             const command = body.split(" ")[0].slice(1).toLowerCase();
-            try {
-                if (commands.exists(command)) {
-                    return (0, utils_1.handleCommand)(command, body, msg, client);
-                }
+            if (commands.exists(command)) {
+                return (0, utils_1.handleCommand)(command, body, msg, client);
             }
-            catch (error) {
-                return msg.reply(error.message || "❌ Error al procesar el comando.");
+            else {
+                return msg.reply("❌ Comando no reconocido.");
             }
         }
     });

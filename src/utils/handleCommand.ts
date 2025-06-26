@@ -1,15 +1,13 @@
 import { Message } from 'whatsapp-web.js';
 import { audioCommand, pingCommand, showAllTopsCommand, uploadFinalCommand } from '../commands';
 import { TopAntipala, Commands } from '../classes';
-import { deleteTopDiarioCommand } from '../commands/deleteTopDiario';
 
 
 export async function handleCommand(command: string, body: string, msg: Message, client: any) {
 	const topAntipala = TopAntipala.getInstance();
 	const commands = Commands.getInstance();
 	try {
-		
-		switch (command) { 
+		switch (command) {
 			case "help":
 			return msg.reply(commands.help());
 
@@ -51,17 +49,7 @@ export async function handleCommand(command: string, body: string, msg: Message,
 			} catch (err: any) {
 				
 				return msg.reply(err.message || "❌ Error al obtener el audio.");
-			} 
-			
-			case "deletetop":
-				try {
-					const reply = await deleteTopDiarioCommand(body);
-					await msg.reply(reply);
-				} catch (err: any) {
-					return msg.reply(err.message || "❌ Error al eliminar un top.");
-				}
-				
-
+			}
 		}
 	} catch (error: any) {
 		if (error.code === 'ECONNREFUSED') {
