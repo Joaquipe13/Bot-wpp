@@ -1,4 +1,3 @@
-// src/bot/events.ts
 import { Client } from "whatsapp-web.js";
 import { showQr } from "../utils/showQr";
 import http from "http";
