@@ -9,12 +9,10 @@ class DatabaseManager {
 	private static instance: DatabaseManager;
 	private pool: Pool;
 	private retryDelay: number;
-	private initDB: boolean;
 
-	private constructor(pool: Pool, retryDelay: number = 2000, initDB: boolean = true) {
+	private constructor(pool: Pool, retryDelay: number = 2000) {
 		this.pool = pool;
 		this.retryDelay = Number(RETRY_DELAY) || retryDelay;
-		this.initDB = initDB;
 	}
 
 	public static async getInstance(): Promise<DatabaseManager> {
@@ -30,9 +28,9 @@ class DatabaseManager {
 				queueLimit: 0,
 			});
 
-			const initDBFlag = DB_INIT === 'true';
+			const initDBFlag: boolean =  DB_INIT === "true" || false
 
-			const instance = new DatabaseManager(pool, Number(RETRY_DELAY), initDBFlag);
+			const instance = new DatabaseManager(pool, Number(RETRY_DELAY));
 
 			if (initDBFlag) {
 				const tempConnection = await mysql.createConnection({
@@ -43,7 +41,6 @@ class DatabaseManager {
 				});
 				await tempConnection.query(`CREATE DATABASE IF NOT EXISTS \`${DB_DATABASE}\`;`);
 				await tempConnection.end();
-
 				await instance.createTables();
 			}
 

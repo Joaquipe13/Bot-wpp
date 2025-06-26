@@ -8,10 +8,9 @@ const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_DATABASE, RETRY_DELAY, DB_INIT } = process.env;
 class DatabaseManager {
-    constructor(pool, retryDelay = 2000, initDB = true) {
+    constructor(pool, retryDelay = 2000) {
         this.pool = pool;
         this.retryDelay = Number(RETRY_DELAY) || retryDelay;
-        this.initDB = initDB;
     }
     static async getInstance() {
         if (!DatabaseManager.instance) {
@@ -25,8 +24,8 @@ class DatabaseManager {
                 connectionLimit: 10,
                 queueLimit: 0,
             });
-            const initDBFlag = DB_INIT === 'true';
-            const instance = new DatabaseManager(pool, Number(RETRY_DELAY), initDBFlag);
+            const initDBFlag = DB_INIT === "true" || false;
+            const instance = new DatabaseManager(pool, Number(RETRY_DELAY));
             if (initDBFlag) {
                 const tempConnection = await promise_1.default.createConnection({
                     host: DB_HOST,
