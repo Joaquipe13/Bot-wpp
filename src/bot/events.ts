@@ -33,23 +33,25 @@ export function registerClientEvents(client: Client, server: http.Server) {
 	const body = msg.body.trim().toLowerCase();
 	console.log(`📩 Mensaje recibido: ${body} de ${msg.from}`);
   
-	if (body.startsWith("Top antipala del dia")) {
-	  try {
-		await topDiarioCommand(body, topAntipala);
-		const reply = await topAntipala.getTopAntipala();
-		return msg.reply(reply);
-	  } catch (error: any) {
-		return msg.reply(error.message || "❌ Error al procesar el top.");
-	  }
+	if (body.startsWith("top antipala del dia")) {
+		try {
+			await topDiarioCommand(body, topAntipala);
+			const reply = await topAntipala.getTopAntipala();
+			return msg.reply(reply);
+		} catch (error: any) {
+			return msg.reply(error.message || "❌ Error al procesar el top.");
+		}
 	}
   
 	if (body.startsWith("/")) {
-	  const command = body.split(" ")[0].slice(1).toLowerCase();
-	  if (commands.exists(command)) {
-		return handleCommand(command, body, msg, client);
-	  } else {
-		return msg.reply("❌ Comando no reconocido.");
-	  }
+		const command = body.split(" ")[0].slice(1);
+		try{
+			if (commands.exists(command)) {
+				return handleCommand(command, body, msg, client);
+			}
+		} catch (error: any) {
+			return msg.reply(error.message || "❌ Error al procesar el comando.");
+		}
 	}
   });
 }
