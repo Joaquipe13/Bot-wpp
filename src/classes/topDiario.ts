@@ -1,6 +1,7 @@
 import {Topero} from './topero';
 import DatabaseManager from '../db/database';
 import type { OkPacket } from 'mysql2';
+import { TopAntipala } from './topAntipala';
 
 
 export class TopDiario {
@@ -35,6 +36,8 @@ export class TopDiario {
 			}
 
 			await conn.commit();
+			const topAntipala = TopAntipala.getInstance();
+			topAntipala.refreshTopsList();
 		} catch (error) {
 			await conn.rollback();
 			console.error("❌ Error en transacción:", error);

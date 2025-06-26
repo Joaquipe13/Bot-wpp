@@ -15,7 +15,7 @@ async function handleCommand(command, body, msg, client) {
             case "topdiario":
                 try {
                     const tops = await (0, commands_1.showAllTopsCommand)();
-                    return msg.reply(tops.join("\n\n"));
+                    return msg.reply(tops);
                 }
                 catch (err) {
                     return msg.reply(err.message || "❌ Error al obtener el top diario.");

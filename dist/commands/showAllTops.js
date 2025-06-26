@@ -5,8 +5,8 @@ const classes_1 = require("../classes");
 async function showAllTopsCommand() {
     try {
         const topAntipala = classes_1.TopAntipala.getInstance();
-        const tops = await topAntipala.getTopsList();
-        return tops;
+        const topList = await topAntipala.getTopsList();
+        return topList;
     }
     catch (error) {
         throw new Error(error.message);

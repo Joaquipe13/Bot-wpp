@@ -17,7 +17,7 @@ export async function handleCommand(command: string, body: string, msg: Message,
 			case "topdiario":
 			try {
 				const tops = await showAllTopsCommand();
-				return msg.reply(tops.join("\n\n"));
+				return msg.reply(tops);
 			} catch (err: any) {
 				return msg.reply(err.message || "❌ Error al obtener el top diario.");
 			}

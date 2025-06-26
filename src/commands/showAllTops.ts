@@ -2,11 +2,11 @@
 import  {TopAntipala}  from "../classes";
 
 
-export async function showAllTopsCommand(): Promise<string[]> {
+export async function showAllTopsCommand(): Promise<string> {
     try {
 		const topAntipala = TopAntipala.getInstance();
-        const tops = await topAntipala.getTopsList();
-		return tops;
+        const topList = await topAntipala.getTopsList();
+		return topList;
     } catch (error:any) {
         throw new Error(error.message);
     }    

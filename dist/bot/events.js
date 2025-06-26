@@ -24,7 +24,7 @@ function registerClientEvents(client, server) {
         console.log(client.info);
     });
     client.on("message", async (msg) => {
-        const body = msg.body.trim();
+        const body = msg.body.trim().toLowerCase();
         console.log(`📩 Mensaje recibido: ${body} de ${msg.from}`);
         if (body.startsWith("Top antipala del dia")) {
             try {

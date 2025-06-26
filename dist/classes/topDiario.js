@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TopDiario = void 0;
 const database_1 = __importDefault(require("../db/database"));
+const topAntipala_1 = require("./topAntipala");
 class TopDiario {
     constructor(date_top, toperos) {
         this.date_top = date_top.toISOString().slice(0, 10);
@@ -24,6 +25,8 @@ class TopDiario {
                 await conn.execute(`INSERT INTO top_diario_toperos (top_diario_id, topero_id, posicion, points) VALUES (?, ?, ?, ?)`, [topDiarioId, topero.id, i + 1, topLength - i]);
             }
             await conn.commit();
+            const topAntipala = topAntipala_1.TopAntipala.getInstance();
+            topAntipala.refreshTopsList();
         }
         catch (error) {
             await conn.rollback();
