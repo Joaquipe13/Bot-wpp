@@ -38,6 +38,14 @@ async function handleCommand(command, body, msg, client) {
                 catch (err) {
                     return msg.reply(err.message || "❌ Error al cargar un final.");
                 }
+            case "falta":
+                try {
+                    const reply = await (0, commands_1.uploadAbsencesCommand)(body);
+                    await msg.reply(reply);
+                }
+                catch (err) {
+                    return msg.reply(err.message || "❌ Error al registrar la falta.");
+                }
             case "play":
                 try {
                     const media = await (0, commands_1.audioCommand)(body);

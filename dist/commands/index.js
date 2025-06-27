@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uploadFinalCommand = exports.showTopOfCommand = exports.showAllTopsCommand = exports.audioCommand = exports.pingCommand = exports.topDiarioCommand = void 0;
+exports.uploadAbsencesCommand = exports.uploadFinalCommand = exports.showTopOfCommand = exports.showAllTopsCommand = exports.audioCommand = exports.pingCommand = exports.topDiarioCommand = void 0;
 var topDiario_1 = require("./topDiario");
 Object.defineProperty(exports, "topDiarioCommand", { enumerable: true, get: function () { return topDiario_1.topDiarioCommand; } });
 var ping_1 = require("./ping");
@@ -13,3 +13,5 @@ var showTopOf_1 = require("./showTopOf");
 Object.defineProperty(exports, "showTopOfCommand", { enumerable: true, get: function () { return showTopOf_1.showTopOfCommand; } });
 var uploadFinal_1 = require("./uploadFinal");
 Object.defineProperty(exports, "uploadFinalCommand", { enumerable: true, get: function () { return uploadFinal_1.uploadFinalCommand; } });
+var uploadAbsences_1 = require("./uploadAbsences");
+Object.defineProperty(exports, "uploadAbsencesCommand", { enumerable: true, get: function () { return uploadAbsences_1.uploadAbsencesCommand; } });

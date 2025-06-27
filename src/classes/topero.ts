@@ -1,6 +1,6 @@
 import DatabaseManager from "../db/database";
 import { RowDataPacket } from 'mysql2';
-
+import { capitalize } from "../utils"; 
 export class Topero {
     id: number;
     name: string;
@@ -10,6 +10,7 @@ export class Topero {
         this.name = name;
     }
 	static async findByName(name: string): Promise<Topero | null> {
+		name = capitalize(name);
 		const dbManager = await DatabaseManager.getInstance();
 		const db = await dbManager.getDB();
 		const [rows] = await db.execute<RowDataPacket[]>(

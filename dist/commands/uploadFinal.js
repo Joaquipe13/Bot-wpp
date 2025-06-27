@@ -3,9 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.uploadFinalCommand = uploadFinalCommand;
 const classes_1 = require("../classes");
 const parseDate_1 = require("../utils/parseDate");
-async function uploadFinalCommand(content) {
+async function uploadFinalCommand(body) {
     try {
-        const match = content.match(/^\/final\s+(\w+)\s+materia:(.+?)\s+nota:(\d+)\s+fecha:(\d{2}\/\d{2}\/\d{4})$/i);
+        const match = body.match(/^\/final\s+(\w+)\s+materia:(.+?)\s+nota:(\d+)\s+fecha:(\d{2}\/\d{2}\/\d{4})$/i);
         if (!match) {
             throw new Error("❌ Formato inválido. Usá:\n/final <nombre> materia:<texto> nota:<número> fecha:dd/mm/aaaa");
         }

@@ -1,8 +1,8 @@
 import {Final, Topero} from '../classes';
 import { parseDate } from '../utils/parseDate';
-export async function uploadFinalCommand(content:string): Promise<string> {
+export async function uploadFinalCommand(body:string): Promise<string> {
 	try {
-		const match = content.match(/^\/final\s+(\w+)\s+materia:(.+?)\s+nota:(\d+)\s+fecha:(\d{2}\/\d{2}\/\d{4})$/i);
+		const match = body.match(/^\/final\s+(\w+)\s+materia:(.+?)\s+nota:(\d+)\s+fecha:(\d{2}\/\d{2}\/\d{4})$/i);
 		if (!match) {
 			throw new Error("❌ Formato inválido. Usá:\n/final <nombre> materia:<texto> nota:<número> fecha:dd/mm/aaaa");
 		}
