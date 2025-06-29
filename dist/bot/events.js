@@ -37,12 +37,20 @@ function registerClientEvents(client, server) {
             }
         }
         if (body.startsWith("/")) {
-            const command = body.split(" ")[0].slice(1).toLowerCase();
-            if (commands.exists(command)) {
-                return (0, utils_1.handleCommand)(command, body, msg, client);
+            try {
+                const command = body.split(" ")[0].slice(1).toLowerCase();
+                if (commands.exists(command)) {
+                    const result = await (0, utils_1.handleCommand)(command, body);
+                    if (result.type === 'text') {
+                        return msg.reply(result.payload);
+                    }
+                    else if (result.type === 'media') {
+                        return client.sendMessage(msg.from, result.payload, { sendAudioAsVoice: true });
+                    }
+                }
             }
-            else {
-                return msg.reply("❌ Comando no reconocido.");
+            catch (error) {
+                return msg.reply(error.message || "❌ Error al procesar el comando.");
             }
         }
     });

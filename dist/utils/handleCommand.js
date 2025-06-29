@@ -3,67 +3,62 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.handleCommand = handleCommand;
 const commands_1 = require("../commands");
 const classes_1 = require("../classes");
-async function handleCommand(command, body, msg, client) {
+async function handleCommand(command, body) {
     const topAntipala = classes_1.TopAntipala.getInstance();
     const commands = classes_1.Commands.getInstance();
     try {
         switch (command) {
             case "help":
-                return msg.reply(commands.help());
+                return { type: 'text', payload: commands.help() };
             case "ping":
-                return (0, commands_1.pingCommand)(msg);
+                return { type: 'text', payload: (0, commands_1.pingCommand)() };
             case "topdiario":
                 try {
-                    const tops = await (0, commands_1.showAllTopsCommand)();
-                    return msg.reply(tops);
+                    return { type: 'text', payload: await (0, commands_1.showAllTopsCommand)() };
                 }
                 catch (err) {
-                    return msg.reply(err.message || "❌ Error al obtener el top diario.");
+                    throw new Error(err.message || "❌ Error al obtener el listado de tops.");
                 }
             case "top":
                 try {
-                    const reply = await topAntipala.getTopAntipala();
-                    return msg.reply(reply);
+                    return { type: 'text', payload: await topAntipala.getTopAntipala() };
                 }
                 catch (err) {
-                    return msg.reply(err.message || "❌ Error al obtener el top.");
+                    throw new Error(err.message || "❌ Error al obtener el top.");
                 }
             case "final":
                 try {
                     const reply = await (0, commands_1.uploadFinalCommand)(body);
-                    await msg.reply(reply);
                     const top = await topAntipala.getTopAntipala();
-                    return msg.reply(top);
+                    return { type: 'text', payload: `${reply}\n${top}` };
                 }
                 catch (err) {
-                    return msg.reply(err.message || "❌ Error al cargar un final.");
+                    throw new Error(err.message || "❌ Error al cargar un final.");
                 }
             case "falta":
                 try {
-                    const reply = await (0, commands_1.uploadAbsencesCommand)(body);
-                    await msg.reply(reply);
+                    return { type: 'text', payload: await (0, commands_1.uploadAbsencesCommand)(body) };
                 }
                 catch (err) {
-                    return msg.reply(err.message || "❌ Error al registrar la falta.");
+                    throw new Error(err.message || "❌ Error al registrar la falta.");
                 }
             case "play":
                 try {
-                    const media = await (0, commands_1.audioCommand)(body);
-                    return client.sendMessage(msg.from, media, {
-                        sendAudioAsVoice: true,
-                    });
+                    return { type: 'media', payload: await (0, commands_1.audioCommand)(body) };
                 }
                 catch (err) {
-                    return msg.reply(err.message || "❌ Error al obtener el audio.");
+                    throw new Error(err.message || "❌ Error al obtener el audio.");
                 }
+            default:
+                throw new Error("❌ Error al procesar el comando.");
         }
     }
     catch (error) {
         if (error.code === 'ECONNREFUSED') {
-            await msg.reply("😴 La base de datos está en descanso. Intentá de nuevo en unos segundos.");
+            throw new Error("😴 La base de datos está en descanso. Intentá de nuevo en unos segundos.");
         }
         else {
-            await msg.reply(error.message || "❌ Error al procesar el comando.");
+            throw new Error(error.message || "❌ Error al procesar el comando.");
         }
     }
 }

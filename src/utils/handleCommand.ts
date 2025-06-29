@@ -3,68 +3,62 @@ import { audioCommand, pingCommand, showAllTopsCommand, uploadFinalCommand, uplo
 import { TopAntipala, Commands } from '../classes';
 
 
-export async function handleCommand(command: string, body: string, msg: Message, client: any) {
+export async function handleCommand(command: string, body: string): Promise<{ type: 'text' | 'media', payload: any }>  {
 	const topAntipala = TopAntipala.getInstance();
 	const commands = Commands.getInstance();
 	try {
 		switch (command) {
 			case "help":
-				return msg.reply(commands.help());
+				return { type: 'text', payload: commands.help() };
 
 			case "ping":
-				return pingCommand(msg);
+				return { type: 'text', payload: pingCommand() };
 
 			case "topdiario":
 				try {
-					const tops = await showAllTopsCommand();
-					return msg.reply(tops);
+					return { type: 'text', payload: await showAllTopsCommand() };
 				} catch (err: any) {
-					return msg.reply(err.message || "❌ Error al obtener el top diario.");
+					throw new Error(err.message ||"❌ Error al obtener el listado de tops.");
 				}
 
 			case "top":
 				try {
-					const reply = await topAntipala.getTopAntipala();
-					return msg.reply(reply);
+					return { type: 'text', payload: await topAntipala.getTopAntipala() };
+
 				} catch (err: any) {
-					return msg.reply(err.message || "❌ Error al obtener el top.");
+					throw new Error(err.message ||"❌ Error al obtener el top.");
 				}
 
 			case "final":
 				try {
 					const reply = await uploadFinalCommand(body);
-					await msg.reply(reply);
-					const top = await topAntipala.getTopAntipala();
-					return msg.reply(top);
+      				const top = await topAntipala.getTopAntipala();
+      				return { type: 'text', payload: `${reply}\n${top}` };
 				} catch (err: any) {
-					return msg.reply(err.message || "❌ Error al cargar un final.");
+					throw new Error(err.message || "❌ Error al cargar un final.");
 				}
 
 			case "falta":
 				try {
-					const reply = await uploadAbsencesCommand(body);
-					await msg.reply(reply);
+					return { type: 'text', payload: await uploadAbsencesCommand(body) };
 				} catch (err: any) {
-					return msg.reply(err.message || "❌ Error al registrar la falta.");
+					throw new Error(err.message || "❌ Error al registrar la falta.");
 				}
 
 			case "play":
 				try {
-					const media = await audioCommand(body);
-					return client.sendMessage(msg.from, media, {
-					sendAudioAsVoice: true,
-					});
+					return { type: 'media', payload: await audioCommand(body) };
 				} catch (err: any) {
-					
-					return msg.reply(err.message || "❌ Error al obtener el audio.");
+					throw new Error(err.message || "❌ Error al obtener el audio.");
 				}
-			
+			default:
+      			throw new Error("❌ Error al procesar el comando.");
 		}
 	} catch (error: any) {
 		if (error.code === 'ECONNREFUSED') {
-			await msg.reply("😴 La base de datos está en descanso. Intentá de nuevo en unos segundos.");
+			throw new Error("😴 La base de datos está en descanso. Intentá de nuevo en unos segundos.");
 		} else {
-			await msg.reply(error.message || "❌ Error al procesar el comando.");		
+			throw new Error(error.message || "❌ Error al procesar el comando.");		
 		}
 	}	
 }
