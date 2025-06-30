@@ -50,7 +50,7 @@ class DatabaseManager {
         }
     }
     async ensureConnection() {
-        let retries = 5;
+        let retries = 10;
         let connected = false;
         while (retries > 0 && !connected) {
             try {

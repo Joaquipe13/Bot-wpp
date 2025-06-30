@@ -43,12 +43,12 @@ function registerClientEvents(client, server) {
                     if (commands.exists(command)) {
                         const result = await (0, utils_1.handleCommand)(command, body);
                         if (result.type === 'text') {
+                            console.log(`${msg.author}\n🔍 Comando ejecutado: ${command} con resultado:`, result.payload);
                             return msg.reply(result.payload);
-                            console.log(`🔍 Comando ejecutado: ${command} con resultado:`, result.payload);
                         }
                         else if (result.type === 'media') {
+                            console.log(`${msg.author}\n🔍 Comando ejecutado: ${command}`);
                             return client.sendMessage(msg.from, result.payload, { sendAudioAsVoice: true });
-                            console.log(`🔍 Comando ejecutado: ${command}`);
                         }
                     }
                 }

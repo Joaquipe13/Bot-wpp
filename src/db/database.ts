@@ -44,15 +44,11 @@ class DatabaseManager {
 					});
 					await tempConnection.query(`CREATE DATABASE IF NOT EXISTS \`${DB_DATABASE}\`;`);
 					await tempConnection.end();
-
 					await instance.createTables();
 				}
-
 				DatabaseManager.instance = instance;
 			}
-
 			await DatabaseManager.instance.ensureConnection();
-
 			return DatabaseManager.instance;
 		} catch (err: any) {
 			console.error("💥 Error creando DatabaseManager:", err);
@@ -61,7 +57,7 @@ class DatabaseManager {
 	}
 
 	private async ensureConnection() {
-		let retries = 5;
+		let retries = 10;
 		let connected = false;
 
 		while (retries > 0 && !connected) {

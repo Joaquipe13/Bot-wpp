@@ -1,4 +1,5 @@
 import qrcode from "qrcode";
+
 import { Client } from "whatsapp-web.js";
 
 let qrSvg: string | null = null;
