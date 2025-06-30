@@ -24,34 +24,42 @@ function registerClientEvents(client, server) {
         console.log(client.info);
     });
     client.on("message", async (msg) => {
-        const body = msg.body.trim().toLowerCase();
-        console.log(`📩 Mensaje recibido: ${body} de ${msg.from}`);
-        if (body.startsWith("Top antipala del dia")) {
-            try {
-                await (0, commands_1.topDiarioCommand)(body, topAntipala);
-                const reply = await topAntipala.getTopAntipala();
-                return msg.reply(reply);
-            }
-            catch (error) {
-                return msg.reply(error.message || "❌ Error al procesar el top.");
-            }
-        }
-        if (body.startsWith("/")) {
-            try {
-                const command = body.split(" ")[0].slice(1).toLowerCase();
-                if (commands.exists(command)) {
-                    const result = await (0, utils_1.handleCommand)(command, body);
-                    if (result.type === 'text') {
-                        return msg.reply(result.payload);
-                    }
-                    else if (result.type === 'media') {
-                        return client.sendMessage(msg.from, result.payload, { sendAudioAsVoice: true });
-                    }
+        try {
+            const body = msg.body.trim().toLowerCase();
+            if (body.startsWith("top antipala del dia")) {
+                try {
+                    await (0, commands_1.topDiarioCommand)(body, topAntipala);
+                    const reply = await topAntipala.getTopAntipala();
+                    console.log("📊 Top Antipala del día:", reply);
+                    return msg.reply(reply);
+                }
+                catch (error) {
+                    return msg.reply(error.message || "❌ Error al procesar el top.");
                 }
             }
-            catch (error) {
-                return msg.reply(error.message || "❌ Error al procesar el comando.");
+            if (body.startsWith("/")) {
+                try {
+                    const command = body.split(" ")[0].slice(1).toLowerCase();
+                    if (commands.exists(command)) {
+                        const result = await (0, utils_1.handleCommand)(command, body);
+                        if (result.type === 'text') {
+                            return msg.reply(result.payload);
+                            console.log(`🔍 Comando ejecutado: ${command} con resultado:`, result.payload);
+                        }
+                        else if (result.type === 'media') {
+                            return client.sendMessage(msg.from, result.payload, { sendAudioAsVoice: true });
+                            console.log(`🔍 Comando ejecutado: ${command}`);
+                        }
+                    }
+                }
+                catch (error) {
+                    return msg.reply(error.message || "❌ Error al procesar el comando.");
+                }
             }
+        }
+        catch (error) {
+            console.error("💥 Error no capturado:", error);
+            return msg.reply(error.message || "❌ Ocurrió un error inesperado.");
         }
     });
 }

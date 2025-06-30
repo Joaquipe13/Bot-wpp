@@ -18,41 +18,46 @@ class DatabaseManager {
 	}
 
 	public static async getInstance(): Promise<DatabaseManager> {
-		if (!DatabaseManager.instance) {
-			const pool = mysql.createPool({
-				host: DB_HOST,
-				port: parseInt(DB_PORT || "3306", 10),
-				user: DB_USER,
-				password: DB_PASSWORD,
-				database: DB_DATABASE,
-				waitForConnections: true,
-				connectionLimit: 10,
-				queueLimit: 0,
-			});
-
-			const initDBFlag = DB_INIT === 'true';
-
-			const instance = new DatabaseManager(pool, Number(RETRY_DELAY), initDBFlag);
-
-			if (initDBFlag) {
-				const tempConnection = await mysql.createConnection({
+		try{
+			if (!DatabaseManager.instance) {
+				const pool = mysql.createPool({
 					host: DB_HOST,
 					port: parseInt(DB_PORT || "3306", 10),
 					user: DB_USER,
 					password: DB_PASSWORD,
+					database: DB_DATABASE,
+					waitForConnections: true,
+					connectionLimit: 10,
+					queueLimit: 0,
 				});
-				await tempConnection.query(`CREATE DATABASE IF NOT EXISTS \`${DB_DATABASE}\`;`);
-				await tempConnection.end();
 
-				await instance.createTables();
+				const initDBFlag = DB_INIT === 'true';
+
+				const instance = new DatabaseManager(pool, Number(RETRY_DELAY), initDBFlag);
+
+				if (initDBFlag) {
+					const tempConnection = await mysql.createConnection({
+						host: DB_HOST,
+						port: parseInt(DB_PORT || "3306", 10),
+						user: DB_USER,
+						password: DB_PASSWORD,
+					});
+					await tempConnection.query(`CREATE DATABASE IF NOT EXISTS \`${DB_DATABASE}\`;`);
+					await tempConnection.end();
+
+					await instance.createTables();
+				}
+
+				DatabaseManager.instance = instance;
 			}
 
-			DatabaseManager.instance = instance;
-		}
+			await DatabaseManager.instance.ensureConnection();
 
-		await DatabaseManager.instance.ensureConnection();
-
-		return DatabaseManager.instance;
+			return DatabaseManager.instance;
+		} catch (err: any) {
+			console.error("💥 Error creando DatabaseManager:", err);
+			throw new Error("❌ No se pudo inicializar la base de datos. Verificá la conexión y la configuración.");
+  		}
 	}
 
 	private async ensureConnection() {

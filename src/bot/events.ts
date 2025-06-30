@@ -30,34 +30,40 @@ export function registerClientEvents(client: Client, server: http.Server) {
     console.log(client.info);
   });
   client.on("message", async (msg) => {
-	const body = msg.body.trim().toLowerCase();
-	console.log(`📩 Mensaje recibido: ${body} de ${msg.from}`);
-  
-	if (body.startsWith("Top antipala del dia")) {
-	  try {
-		await topDiarioCommand(body, topAntipala);
-		const reply = await topAntipala.getTopAntipala();
-		return msg.reply(reply);
-	  } catch (error: any) {
-		return msg.reply(error.message || "❌ Error al procesar el top.");
-	  }
-	}
-  
-	if (body.startsWith("/")) {
-		try{
-			const command = body.split(" ")[0].slice(1).toLowerCase();
-			if (commands.exists(command)) {
-				const result = await handleCommand(command, body);
-				if (result.type === 'text') {
-					return msg.reply(result.payload);
-				} else if (result.type === 'media') {
-				return client.sendMessage(msg.from, result.payload, { sendAudioAsVoice: true });
-				}
-			}
+	try {
+		const body = msg.body.trim().toLowerCase();
+		if (body.startsWith("top antipala del dia")) {
+		try {
+			await topDiarioCommand(body, topAntipala);
+			const reply = await topAntipala.getTopAntipala();
+			console.log("📊 Top Antipala del día:", reply);
+			return msg.reply(reply);
 		} catch (error: any) {
-			return msg.reply(error.message || "❌ Error al procesar el comando.");
-
+			return msg.reply(error.message || "❌ Error al procesar el top.");
 		}
+		}
+	
+		if (body.startsWith("/")) {
+			try{
+				const command = body.split(" ")[0].slice(1).toLowerCase();
+				if (commands.exists(command)) {
+					const result = await handleCommand(command, body);
+					if (result.type === 'text') {
+						return msg.reply(result.payload);
+						console.log(`🔍 Comando ejecutado: ${command} con resultado:`, result.payload);
+					} else if (result.type === 'media') {
+						return client.sendMessage(msg.from, result.payload, { sendAudioAsVoice: true });
+						console.log(`🔍 Comando ejecutado: ${command}`);
+					}
+				}
+			} catch (error: any) {
+				return msg.reply(error.message || "❌ Error al procesar el comando.");
+
+			}
+		}
+	} catch (error: any) {
+		console.error("💥 Error no capturado:", error);
+    	return msg.reply(error.message || "❌ Ocurrió un error inesperado.");
 	}
   });
 }

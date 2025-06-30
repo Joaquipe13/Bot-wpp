@@ -27,37 +27,43 @@ class TopAntipala {
         return TopAntipala.instance;
     }
     async getTopAntipala() {
-        if (this.top) {
-            return this.top;
+        try {
+            if (this.top) {
+                return this.top;
+            }
+            const db = await this.getDB();
+            const [rows] = await db.query(`
+				SELECT 
+				t.name,
+				COALESCE(tops.total_top_points, 0) - COALESCE(finals.total_final_points, 0) AS total_points
+				FROM toperos t
+				LEFT JOIN (
+				SELECT topero_id, SUM(points) AS total_top_points
+				FROM top_diario_toperos
+				GROUP BY topero_id
+				) AS tops ON tops.topero_id = t.id
+				LEFT JOIN (
+				SELECT topero_id, SUM(points) AS total_final_points
+				FROM finales
+				GROUP BY topero_id
+				) AS finals ON finals.topero_id = t.id
+				ORDER BY total_points DESC;
+			`);
+            const results = rows;
+            if (results.length === 0) {
+                return "📉 No hay registros aún para el Top Antipala.";
+            }
+            let mensaje = "🔝 Top Antipala:\n";
+            results.forEach((results, index) => {
+                mensaje += `${index + 1}. ${results.name} (${results.total_points} pts)\n`;
+            });
+            this.top = mensaje.trim();
+            return mensaje.trim();
         }
-        const db = await this.getDB();
-        const [rows] = await db.query(`
-			SELECT 
-			t.name,
-			COALESCE(tops.total_top_points, 0) - COALESCE(finals.total_final_points, 0) AS total_points
-			FROM toperos t
-			LEFT JOIN (
-			SELECT topero_id, SUM(points) AS total_top_points
-			FROM top_diario_toperos
-			GROUP BY topero_id
-			) AS tops ON tops.topero_id = t.id
-			LEFT JOIN (
-			SELECT topero_id, SUM(points) AS total_final_points
-			FROM finales
-			GROUP BY topero_id
-			) AS finals ON finals.topero_id = t.id
-			ORDER BY total_points DESC;
-		`);
-        const results = rows;
-        if (results.length === 0) {
-            return "📉 No hay registros aún para el Top Antipala.";
+        catch (error) {
+            console.error("Error al obtener el Top Antipala:", error);
+            throw new Error("❌ Error al obtener el Top Antipala.");
         }
-        let mensaje = "🔝 Top Antipala:\n";
-        results.forEach((results, index) => {
-            mensaje += `${index + 1}. ${results.name} (${results.total_points} pts)\n`;
-        });
-        this.top = mensaje.trim();
-        return mensaje.trim();
     }
     async validarUsuariosExistentes(nombres) {
         const db = await this.getDB();
