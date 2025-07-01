@@ -17,7 +17,7 @@ async function main() {
         console.log("✅ Base de datos lista y bot inicializado");
         const client = (0, bot_1.createClient)();
         (0, bot_1.registerClientEvents)(client, server);
-        client.initialize();
+        (0, bot_1.initializeClientWithRetry)(client);
         server.listen(port, () => {
             const url = process.env.RAILWAY_STATIC_URL || `http://localhost:${port}`;
             console.log(`🌐 Escuchando en: ${url}`);

@@ -6,7 +6,6 @@ const commands_1 = require("../commands");
 const classes_1 = require("../classes");
 const utils_1 = require("../utils/");
 const topAntipala = classes_1.TopAntipala.getInstance();
-const commands = classes_1.Commands.getInstance();
 function registerClientEvents(client, server) {
     (0, showQr_1.showQr)(client, (handler) => {
         server.on("request", handler);
@@ -26,12 +25,15 @@ function registerClientEvents(client, server) {
     client.on("message", async (msg) => {
         try {
             const body = msg.body.trim().toLowerCase();
+            const userId = msg.author ? msg.author.split("@")[0] : msg.from.split("@")[0];
             if (body.startsWith("top antipala del dia")) {
                 try {
-                    await (0, commands_1.topDiarioCommand)(body, topAntipala);
-                    const reply = await topAntipala.getTopAntipala();
-                    console.log("📊 Top Antipala del día:", reply);
-                    return msg.reply(reply);
+                    if (classes_1.Commands.hasPermission(userId)) {
+                        await (0, commands_1.topDiarioCommand)(body, topAntipala);
+                        const reply = await topAntipala.getTopAntipala();
+                        console.log("📊 Top Antipala del día:", reply);
+                        return msg.reply(reply);
+                    }
                 }
                 catch (error) {
                     return msg.reply(error.message || "❌ Error al procesar el top.");
@@ -40,14 +42,18 @@ function registerClientEvents(client, server) {
             if (body.startsWith("/")) {
                 try {
                     const command = body.split(" ")[0].slice(1).toLowerCase();
-                    if (commands.exists(command)) {
+                    if (command === "help") {
+                        const helpMessage = classes_1.Commands.getInstance().help(userId);
+                        return msg.reply(helpMessage);
+                    }
+                    if (classes_1.Commands.exists(command)) {
+                        classes_1.Commands.hasPermission(userId, command);
                         const result = await (0, utils_1.handleCommand)(command, body);
+                        console.log(`${userId}\n🔍 Comando ejecutado: ${command}`);
                         if (result.type === 'text') {
-                            console.log(`${msg.author}\n🔍 Comando ejecutado: ${command} con resultado:`, result.payload);
                             return msg.reply(result.payload);
                         }
                         else if (result.type === 'media') {
-                            console.log(`${msg.author}\n🔍 Comando ejecutado: ${command}`);
                             return client.sendMessage(msg.from, result.payload, { sendAudioAsVoice: true });
                         }
                     }

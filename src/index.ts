@@ -1,7 +1,7 @@
 import DatabaseManager from "./db/database";
 import dotenv from "dotenv";
 import http from "http";
-import { registerClientEvents, createClient } from "./bot";
+import { registerClientEvents, createClient, initializeClientWithRetry  } from "./bot";
 
 
 async function main() {
@@ -17,7 +17,8 @@ async function main() {
 
 		const client = createClient();
 		registerClientEvents(client, server);
-		client.initialize();
+
+		initializeClientWithRetry(client);
 
 		server.listen(port, () => {
 		const url = process.env.RAILWAY_STATIC_URL || `http://localhost:${port}`;

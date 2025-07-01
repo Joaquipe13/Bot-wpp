@@ -9,20 +9,39 @@ class Commands {
         }
         return Commands.instance;
     }
-    exists(cmd) {
-        if (Commands.commands.includes(cmd.toLowerCase())) {
+    static exists(cmd) {
+        if (cmd in Commands.commands)
             return true;
-        }
-        else {
-            throw new Error(`El comando '/${cmd}' no existe.\n\nUse '/help' para ver la lista de comandos disponibles.`);
-        }
+        throw new Error(`El comando '/${cmd}' no existe.\n\nUse '/help' para ver la lista de comandos disponibles.`);
     }
-    help() {
-        return Commands.commands.map(cmd => `/${cmd}`).join("\n");
+    static hasPermission(userId, cmd = "") {
+        const type = Commands.commands[cmd];
+        if (type === 'admin' || cmd === "") {
+            if (!Commands.adminUsers.includes(userId)) {
+                throw new Error(`No tienes permisos para ejecutar el comando ${cmd}.\n\nUse '/help' para ver la lista de comandos disponibles.`);
+            }
+        }
+        return true;
+    }
+    help(userId) {
+        const isAdmin = Commands.adminUsers.includes(userId);
+        return 'Comandos disponibles:\n\n' +
+            Object.entries(Commands.commands)
+                .filter(([_, type]) => type === 'common' || isAdmin)
+                .map(([cmd, type]) => `/${cmd}${type === 'admin' ? ' (admin)' : ''}`)
+                .join(', ');
     }
     getAll() {
-        return [...Commands.commands];
+        return Object.keys(Commands.commands);
     }
 }
 exports.Commands = Commands;
-Commands.commands = ["help", "ping", "top", "play", "final", "topdiario"];
+Commands.commands = {
+    help: 'common',
+    ping: 'common',
+    topdiario: 'common',
+    play: 'common',
+    final: 'admin',
+    top: 'common',
+};
+Commands.adminUsers = ['222359231398085'];

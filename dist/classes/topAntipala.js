@@ -7,18 +7,19 @@ exports.TopAntipala = void 0;
 const topero_1 = require("./topero");
 const utils_1 = require("../utils");
 const database_1 = __importDefault(require("../db/database"));
+const cuatrimestre_1 = require("./cuatrimestre");
 class TopAntipala {
     async getDB() {
         const dbManager = await database_1.default.getInstance();
         return dbManager.getDB();
     }
     constructor() {
-        this.top = null;
+        this.tops = {};
         this.topList = null;
     }
     refreshTopsList() {
         this.topList = null;
-        this.top = null;
+        this.tops = {};
     }
     static getInstance() {
         if (!TopAntipala.instance) {
@@ -26,42 +27,56 @@ class TopAntipala {
         }
         return TopAntipala.instance;
     }
-    async getTopAntipala() {
+    async getTopAntipala(period) {
         try {
-            if (this.top) {
-                return this.top;
+            if (!period) {
+                period = cuatrimestre_1.PeriodManager.resolvePeriodByDate(new Date());
             }
+            if (this.tops[period]) {
+                return this.tops[period];
+            }
+            const periodDates = cuatrimestre_1.PeriodManager.getPeriod(period);
             const db = await this.getDB();
             const [rows] = await db.query(`
 				SELECT 
-				t.name,
-				COALESCE(tops.total_top_points, 0) - COALESCE(finals.total_final_points, 0) AS total_points
+					t.name,
+					COALESCE(tops.total_top_points, 0) - COALESCE(finals.total_final_points, 0) AS total_points
 				FROM toperos t
 				LEFT JOIN (
-				SELECT topero_id, SUM(points) AS total_top_points
-				FROM top_diario_toperos
-				GROUP BY topero_id
+					SELECT topero_id, SUM(points) AS total_top_points
+					FROM top_diario_toperos td
+					JOIN top_diarios d ON td.top_diario_id = d.id
+					WHERE STR_TO_DATE(d.date_top, '%d/%m/%Y') BETWEEN ? AND ?
+					GROUP BY topero_id
 				) AS tops ON tops.topero_id = t.id
 				LEFT JOIN (
-				SELECT topero_id, SUM(points) AS total_final_points
-				FROM finales
-				GROUP BY topero_id
+					SELECT topero_id, SUM(points) AS total_final_points
+					FROM finales
+					WHERE date_top BETWEEN ? AND ?
+					GROUP BY topero_id
 				) AS finals ON finals.topero_id = t.id
 				ORDER BY total_points DESC;
-			`);
+				`, [
+                periodDates.date_start,
+                periodDates.date_end,
+                periodDates.date_start,
+                periodDates.date_end
+            ]);
             const results = rows;
             if (results.length === 0) {
-                return "📉 No hay registros aún para el Top Antipala.";
+                return `📉 No hay registros aún para el Top Antipala del período ${period}.`;
             }
-            let mensaje = "🔝 Top Antipala:\n";
+            const peeriodInfo = period.split("-");
+            const anio = peeriodInfo[0];
+            const cuatri = peeriodInfo[1] === "1" ? "1er cuatrimestre" : "2do cuatrimestre";
+            let mensaje = `🔝 Top Antipala ${cuatri} ${anio}:\n`;
             results.forEach((results, index) => {
                 mensaje += `${index + 1}. ${results.name} (${results.total_points} pts)\n`;
             });
-            this.top = mensaje.trim();
+            this.tops[period] = mensaje.trim();
             return mensaje.trim();
         }
         catch (error) {
-            console.error("Error al obtener el Top Antipala:", error);
             throw new Error("❌ Error al obtener el Top Antipala.");
         }
     }

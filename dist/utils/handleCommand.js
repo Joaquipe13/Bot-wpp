@@ -5,11 +5,8 @@ const commands_1 = require("../commands");
 const classes_1 = require("../classes");
 async function handleCommand(command, body) {
     const topAntipala = classes_1.TopAntipala.getInstance();
-    const commands = classes_1.Commands.getInstance();
     try {
         switch (command) {
-            case "help":
-                return { type: 'text', payload: commands.help() };
             case "ping":
                 return { type: 'text', payload: (0, commands_1.pingCommand)() };
             case "topdiario":
@@ -21,7 +18,7 @@ async function handleCommand(command, body) {
                 }
             case "top":
                 try {
-                    return { type: 'text', payload: await topAntipala.getTopAntipala() };
+                    return { type: 'text', payload: await topAntipala.getTopAntipala(body) };
                 }
                 catch (err) {
                     throw new Error(err.message || "❌ Error al obtener el top.");

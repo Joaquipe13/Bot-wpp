@@ -1,16 +1,11 @@
-import { Message } from 'whatsapp-web.js';
 import { audioCommand, pingCommand, showAllTopsCommand, uploadFinalCommand, uploadAbsencesCommand } from '../commands';
-import { TopAntipala, Commands } from '../classes';
+import { TopAntipala } from '../classes';
 
 
 export async function handleCommand(command: string, body: string): Promise<{ type: 'text' | 'media', payload: any }>  {
 	const topAntipala = TopAntipala.getInstance();
-	const commands = Commands.getInstance();
 	try {
 		switch (command) {
-			case "help":
-				return { type: 'text', payload: commands.help() };
-
 			case "ping":
 				return { type: 'text', payload: pingCommand() };
 
@@ -23,8 +18,7 @@ export async function handleCommand(command: string, body: string): Promise<{ ty
 
 			case "top":
 				try {
-					return { type: 'text', payload: await topAntipala.getTopAntipala() };
-
+					return { type: 'text', payload: await topAntipala.getTopAntipala(body) };
 				} catch (err: any) {
 					throw new Error(err.message ||"❌ Error al obtener el top.");
 				}
