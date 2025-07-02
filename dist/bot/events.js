@@ -5,6 +5,7 @@ const showQr_1 = require("../utils/showQr");
 const commands_1 = require("../commands");
 const classes_1 = require("../classes");
 const utils_1 = require("../utils/");
+const restartClient_1 = require("./restartClient");
 const topAntipala = classes_1.TopAntipala.getInstance();
 function registerClientEvents(client, server) {
     (0, showQr_1.showQr)(client, (handler) => {
@@ -15,9 +16,11 @@ function registerClientEvents(client, server) {
     });
     client.on("auth_failure", (msg) => {
         console.error("❌ Falló la autenticación:", msg);
+        (0, restartClient_1.restartClient)(server);
     });
     client.on("disconnected", (reason) => {
         console.warn("⚠️ Desconectado:", reason);
+        (0, restartClient_1.restartClient)(server);
     });
     client.on("ready", () => {
         console.log(client.info);

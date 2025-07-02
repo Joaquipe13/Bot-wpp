@@ -4,6 +4,7 @@ import http from "http";
 import { topDiarioCommand } from "../commands";
 import { TopAntipala, Commands } from "../classes";
 import { handleCommand } from "../utils/";
+import { restartClient } from "./restartClient";
 
 const topAntipala = TopAntipala.getInstance();
 
@@ -18,10 +19,12 @@ export function registerClientEvents(client: Client, server: http.Server) {
 
   client.on("auth_failure", (msg) => {
     console.error("❌ Falló la autenticación:", msg);
+	restartClient(server)
   });
 
   client.on("disconnected", (reason) => {
     console.warn("⚠️ Desconectado:", reason);
+	restartClient(server)
   });
 
   client.on("ready", () => {
