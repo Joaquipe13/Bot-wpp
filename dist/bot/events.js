@@ -65,6 +65,7 @@ function registerClientEvents(client, server) {
         }
         catch (error) {
             console.error("💥 Error no capturado:", error);
+            console.error("Mensaje que causó el error:", msg.body);
             return msg.reply(error.message || "❌ Ocurrió un error inesperado.");
         }
     });
