@@ -37,11 +37,11 @@ class Commands {
 }
 exports.Commands = Commands;
 Commands.commands = {
-    help: 'common',
-    ping: 'common',
-    topdiario: 'common',
+    //help: 'common',
+    //ping: 'common',
+    //topdiario: 'common',
     play: 'common',
-    final: 'admin',
-    top: 'common',
+    //final: 'admin',
+    //top: 'common',
 };
 Commands.adminUsers = ['222359231398085'];

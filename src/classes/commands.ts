@@ -1,12 +1,12 @@
 export class Commands {
 	private static instance: Commands;
 	private static readonly commands: Record<string, 'common' | 'admin'> = {
-		help: 'common',
-		ping: 'common',
-		topdiario: 'common',
+		//help: 'common',
+		//ping: 'common',
+		//topdiario: 'common',
 		play: 'common',
-		final: 'admin',
-		top: 'common',
+		//final: 'admin',
+		//top: 'common',
 	};
 	private static readonly adminUsers: string[] = ['222359231398085'];
 	private constructor() {}

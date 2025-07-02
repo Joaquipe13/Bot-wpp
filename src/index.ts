@@ -21,8 +21,6 @@ async function main() {
 		initializeClientWithRetry(client);
 
 		server.listen(port, () => {
-			const url = process.env.RAILWAY_STATIC_URL || `http://localhost:${port}`;
-			console.log(`🌐 Escuchando en: ${url}`);
 		});
 	} catch (error) {
 		console.error("❌ Error al iniciar:", error);
